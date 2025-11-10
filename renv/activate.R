@@ -967,7 +967,6 @@ local({
   }
   
   renv_bootstrap_validate_version_dev <- function(version, description) {
-<<<<<<< HEAD
   
     expected <- description[["RemoteSha"]]
     if (!is.character(expected))
@@ -976,16 +975,6 @@ local({
     pattern <- sprintf("^\\Q%s\\E", version)
     grepl(pattern, expected, perl = TRUE)
   
-=======
-    
-    expected <- description[["RemoteSha"]]
-    if (!is.character(expected))
-      return(FALSE)
-    
-    pattern <- sprintf("^\\Q%s\\E", version)
-    grepl(pattern, expected, perl = TRUE)
-    
->>>>>>> parent of 7152e22 (bad edits)
   }
   
   renv_bootstrap_validate_version_release <- function(version, description) {
@@ -1226,7 +1215,6 @@ local({
   }
   
   renv_json_read_patterns <- function() {
-<<<<<<< HEAD
   
     list(
   
@@ -1246,46 +1234,20 @@ local({
   
     )
   
-=======
-    
-    list(
-      
-      # objects
-      list("{", "\t\n\tobject(\t\n\t"),
-      list("}", "\t\n\t)\t\n\t"),
-      
-      # arrays
-      list("[", "\t\n\tarray(\t\n\t"),
-      list("]", "\n\t\n)\n\t\n"),
-      
-      # maps
-      list(":", "\t\n\t=\t\n\t")
-      
-    )
-    
->>>>>>> parent of 7152e22 (bad edits)
   }
   
   renv_json_read_envir <- function() {
   
     envir <- new.env(parent = emptyenv())
-<<<<<<< HEAD
   
     envir[["+"]] <- `+`
     envir[["-"]] <- `-`
   
-=======
-    
-    envir[["+"]] <- `+`
-    envir[["-"]] <- `-`
-    
->>>>>>> parent of 7152e22 (bad edits)
     envir[["object"]] <- function(...) {
       result <- list(...)
       names(result) <- as.character(names(result))
       result
     }
-<<<<<<< HEAD
   
     envir[["array"]] <- list
   
@@ -1302,83 +1264,40 @@ local({
     # repair names if necessary
     if (!is.null(names(object))) {
   
-=======
-    
-    envir[["array"]] <- list
-    
-    envir[["true"]]  <- TRUE
-    envir[["false"]] <- FALSE
-    envir[["null"]]  <- NULL
-    
-    envir
-    
-  }
-  
-  renv_json_read_remap <- function(object, patterns) {
-    
-    # repair names if necessary
-    if (!is.null(names(object))) {
-      
->>>>>>> parent of 7152e22 (bad edits)
       nms <- names(object)
       for (pattern in patterns)
         nms <- gsub(pattern[[2L]], pattern[[1L]], nms, fixed = TRUE)
       names(object) <- nms
-<<<<<<< HEAD
   
     }
   
-=======
-      
-    }
-    
->>>>>>> parent of 7152e22 (bad edits)
     # repair strings if necessary
     if (is.character(object)) {
       for (pattern in patterns)
         object <- gsub(pattern[[2L]], pattern[[1L]], object, fixed = TRUE)
     }
-<<<<<<< HEAD
   
-=======
-    
->>>>>>> parent of 7152e22 (bad edits)
     # recurse for other objects
     if (is.recursive(object))
       for (i in seq_along(object))
         object[i] <- list(renv_json_read_remap(object[[i]], patterns))
-<<<<<<< HEAD
   
     # return remapped object
     object
   
-=======
-    
-    # return remapped object
-    object
-    
->>>>>>> parent of 7152e22 (bad edits)
   }
   
   renv_json_read_default <- function(file = NULL, text = NULL) {
   
     # read json text
     text <- paste(text %||% readLines(file, warn = FALSE), collapse = "\n")
-<<<<<<< HEAD
   
-=======
-    
->>>>>>> parent of 7152e22 (bad edits)
     # convert into something the R parser will understand
     patterns <- renv_json_read_patterns()
     transformed <- text
     for (pattern in patterns)
       transformed <- gsub(pattern[[1L]], pattern[[2L]], transformed, fixed = TRUE)
-<<<<<<< HEAD
   
-=======
-    
->>>>>>> parent of 7152e22 (bad edits)
     # parse it
     rfile <- tempfile("renv-json-", fileext = ".R")
     on.exit(unlink(rfile), add = TRUE)
@@ -1387,17 +1306,11 @@ local({
   
     # evaluate in safe environment
     result <- eval(json, envir = renv_json_read_envir())
-<<<<<<< HEAD
   
     # fix up strings if necessary -- do so only with reversible patterns
     patterns <- Filter(function(pattern) pattern[[3L]], patterns)
     renv_json_read_remap(result, patterns)
-=======
->>>>>>> parent of 7152e22 (bad edits)
   
-    # fix up strings if necessary
-    renv_json_read_remap(result, patterns)
-    
   }
   
 
