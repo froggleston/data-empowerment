@@ -52,7 +52,7 @@ po/*~
 
 # renv sandbox needed for renv version 0.16.0
 renv/sandbox # OPTIONAL
-renv*
+#renv*
 
 # Mac system files
 .DS_Store
