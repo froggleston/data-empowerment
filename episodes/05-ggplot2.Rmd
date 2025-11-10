@@ -286,7 +286,7 @@ color corresponding to the different values of the variable.
 
 Let's apply this to our plot below, changing the color of each point based on 
 the hour:
-```{r adding-colors, purl=FALSE}
+```{r change-colors, purl=FALSE}
 hourly_counts %>%
   ggplot(aes(x = hour, y = n)) +
   geom_line() +
@@ -308,7 +308,7 @@ column to our hourly_counts tibble that indicates whether the count at that
 hour is above or below the calculated average! Then, we will use the `scale_color_manual` 
 function to manually color these points green and red instead of the default (which,
 when writing this lesson, was red and blue, respectively).
-```{r adding-colors, purl=FALSE}
+```{r avg-colors, purl=FALSE}
 #calculate average
 average <- mean(hourly_counts$n)
 
@@ -323,7 +323,7 @@ hourly_counts %>%
 
 Additionally, you may want to increase the size of the points! This can be accomplished 
 using the `size` argument within the `geom_point` function, as seen below:
-```{r adding-colors, purl=FALSE}
+```{r scalepts, purl=FALSE}
 #calculate average
 average <- mean(hourly_counts$n)
 
@@ -374,7 +374,7 @@ is numeric (or continuous!). Within this function, you can control the axis limi
 (or range) and breaks (where tick marks appear).
 
 Let's finish our plot using this function:
-```{r barplot-wall-types-labeled, fig.alt="Previous plot with plot title and labells added."}
+```{r barplot-wall-types-labeled2, fig.alt="Previous plot with plot title and labels added."}
 hourly_counts %>%
   mutate(avg_color = ifelse(n > average, "Above", "Below")) %>%
   ggplot(aes(x = hour, y = n)) +
@@ -719,7 +719,7 @@ similar proportions (aka. usage rates) when sample sizes are taken into consider
 
 If you'd prefer to visualize percentages instead of proportions, you can multiply 
 the prop column by 100! For example:
-```{r ggplot-with-plus-position, eval=FALSE, purl=FALSE}
+```{r scaleandplot, eval=FALSE, purl=FALSE}
 prop_device <- prop_device %>%
   mutate(prop = (prop * 100))
 ```

@@ -375,7 +375,7 @@ data %>%
 
 Or, to instead arrange from highest to lowest, include desc() around the **`arrange()`**
 attribute, as seen below:
-```{r arrange-asc, purl=FALSE}
+# ```{r arrange-desc, purl=FALSE}
 data %>%
   group_by(precinct) %>%
   summarize(total_checkins = n()) %>%
