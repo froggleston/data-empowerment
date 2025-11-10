@@ -312,70 +312,70 @@ You can either download the data used for this lesson from GitHub or with R.
 
 #### Check-In Dataset:
 
-You can either copy the data from this [GitHub link](https://raw.githubusercontent.com/ml4sts/data-empowerment-lessons/main/episodes/data/checkin_data.csv)
+You can either copy the data from [GitHub ](https://raw.githubusercontent.com/EngineeringForDemocracy/data-empowerment/main/episodes/data/checkin_data.csv)
 and paste it into a file called `checkin_data.csv` in the `data/` directory or
 copy-paste the below code chunk into your terminal:
 ```{r anonymized_data, eval=FALSE}
 download.file(
-  "https://raw.githubusercontent.com/ml4sts/data-empowerment-lessons/main/episodes/data/checkin_data.csv",
+  "https://raw.githubusercontent.com/EngineeringForDemocracy/data-empowerment/main/episodes/data/checkin_data.csv",
   "data/checkin_data.csv", mode = "wb"
   )
 ```
 
 #### Check-In Plotting Dataset:
 
-You can either copy the data from this [GitHub link](https://raw.githubusercontent.com/ml4sts/data-empowerment-lessons/main/episodes/data/checkin_sample_plotting.csv)
+You can either copy the data from this [GitHub ](https://raw.githubusercontent.com/EngineeringForDemocracy/data-empowerment/main/episodes/data/checkin_sample_plotting.csv)
 and paste it into a file called `checkin_sample_plotting.csv` in the `data/` directory or
 copy-paste the below code chunk into your terminal:
 ```{r anonymized_data, eval=FALSE}
 download.file(
-  "https://raw.githubusercontent.com/ml4sts/data-empowerment-lessons/main/episodes/data/checkin_sample_plotting.csv",
+  "https://raw.githubusercontent.com/EngineeringForDemocracy/data-empowerment/main/episodes/data/checkin_sample_plotting.csv",
   "data/checkin_sample_plotting.csv", mode = "wb"
   )
 ```
 
 #### Messy Dataset:
 
-You can either copy the data from this [GitHub link](https://raw.githubusercontent.com/ml4sts/data-empowerment-lessons/main/episodes/data/messy_data.csv)
+You can either copy the data from this [GitHub link](https://raw.githubusercontent.com/EngineeringForDemocracy/data-empowerment/main/episodes/data/messy_data.csv)
 and paste it into a file called `messy_data.csv` in the `data/` directory or
 copy-paste the below code chunk into your terminal:
 ```{r anonymized_data, eval=FALSE}
 download.file(
-  "https://raw.githubusercontent.com/ml4sts/data-empowerment-lessons/main/episodes/data/messy_data.csv",
+  "https://raw.githubusercontent.com/EngineeringForDemocracy/data-empowerment/main/episodes/data/messy_data.csv",
   "messy_data.csv", mode = "wb"
   )
 ```
 
 #### Game of Thrones Dataset:
 
-You can either copy the data from this [GitHub link](https://raw.githubusercontent.com/ml4sts/data-empowerment-lessons/main/episodes/data/voting_GoT.csv)
+You can either copy the data from this [GitHub link](https://raw.githubusercontent.com/EngineeringForDemocracy/data-empowerment/main/episodes/data/voting_GoT.csv)
 and paste it into a file called `voting_GoT.csv` in the `data/` directory or
 copy-paste the below code chunk into your terminal:
 ```{r anonymized_data, eval=FALSE}
 download.file(
-  "https://raw.githubusercontent.com/ml4sts/data-empowerment-lessons/main/episodes/data/voting_GoT.csv",
+  "https://raw.githubusercontent.com/EngineeringForDemocracy/data-empowerment/main/episodes/data/voting_GoT.csv",
   "data/voting_GoT.csv", mode = "wb"
   )
 ```
 
-You can either copy the data from this [GitHub link](https://raw.githubusercontent.com/ml4sts/data-empowerment-lessons/main/episodes/data/polygons_GoT.geojson)
+You can either copy the data from this [GitHub link](https://raw.githubusercontent.com/EngineeringForDemocracy/data-empowerment/main/episodes/data/polygons_GoT.geojson)
 and paste it into a file called `polygons_GoT.geojson` in the `data/` directory or
 copy-paste the below code chunk into your terminal:
 ```{r anonymized_data, eval=FALSE}
 download.file(
-  "https://raw.githubusercontent.com/ml4sts/data-empowerment-lessons/main/episodes/data/polygons_GoT.geojson",
+  "https://raw.githubusercontent.com/EngineeringForDemocracy/data-empowerment/main/episodes/data/polygons_GoT.geojson",
   "polygons_GoT.geojson", mode = "wb"
   )
 ```
 
 #### JSON Check-In Dataset:
 
-You can either copy the data from this [GitHub link](https://raw.githubusercontent.com/ml4sts/data-empowerment-lessons/main/episodes/data/checkin_snippet.json)
+You can either copy the data from this [GitHub link](https://raw.githubusercontent.com/EngineeringForDemocracy/data-empowerment/main/episodes/data/checkin_snippet.json)
 and paste it into a file called `checkin_snippet.json` in the `data/` directory or
 copy-paste the below code chunk into your terminal:
 ```{r anonymized_data, eval=FALSE}
 download.file(
-  "https://raw.githubusercontent.com/ml4sts/data-empowerment-lessons/main/episodes/data/checkin_snippet.json",
+  "https://raw.githubusercontent.com/EngineeringForDemocracy/data-empowerment/main/episodes/data/checkin_snippet.json",
   "data/checkin_snippet.json", mode = "wb"
   )
 ```
