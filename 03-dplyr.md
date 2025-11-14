@@ -8,387 +8,299 @@ source: Rmd
 
 :::: instructor
 
-- This lesson works better if you have graphics demonstrating dplyr commands.
-  You can modify [this Google Slides deck](https://docs.google.com/presentation/d/1A9abypFdFp8urAe9z7GCMjFr4aPeIb8mZAtJA2F7H0w/edit#slide=id.g652714585f_0_114) and use it for your workshop.
-- For this lesson make sure that learners are comfortable using pipes.
-- There is also sometimes some confusion on what the arguments of `group_by`
-  should be, and when to use `filter()` and `select()`.
+-   The main goal of this lesson is to introduce the dplyr package -- a powerful 
+    tool for data manipulation in **`R`**.
+-   We will cover the basics such as selecting columns, filtering rows, chaining 
+    commands with pipes, creating new columns with mutate, and summarizing data 
+    by grouping.
+-   When covering pipes, some may find it helpful to read the pipe like the word 
+    "then". Thus, when explaining the workflow, phrase it as "we take the data 
+    *then* we `filter` our rows *then* we `select` our columns"
+-   While the dplyr functions simplify data wrangling, it's important to ensure 
+    learners grasp each concept step by step to build a solid foundation for their
+    future data analysis workflow.
+-   If you would like additional information and visual representation of the 
+    function, the following site showcases some good tutorials and visuals: 
+    <https://tidydatatutor.com/>
 
 ::::::::::::
 
-
 ::::::::::::::::::::::::::::::::::::::: objectives
 
-- Describe the purpose of an R package and the **`dplyr`** package.
-- Select certain columns in a dataframe with the **`dplyr`** function `select`.
-- Select certain rows in a dataframe according to filtering conditions with the **`dplyr`** function `filter`.
-- Link the output of one **`dplyr`** function to the input of another function with the 'pipe' operator `%>%`.
-- Add new columns to a dataframe that are functions of existing columns with `mutate`.
-- Use the split-apply-combine concept for data analysis.
-- Use `summarize`, `group_by`, and `count` to split a dataframe into groups of observations, apply a summary statistics for each group, and then combine the results.
-
+-   Understand the purpose of the **`dplyr`** package.
+-   Learn how to select specific columns from a tibble using **`select`**.
+-   Learn how to filter rows based on conditions using **`filter()`**.
+-   Use the pipe operator **`(%\>%)`** to seamlessly chain multiple dplyr commands.
+-   Create new columns in a tibble with **`mutate()`**, deriving them from existing 
+    data.
+-   Apply the split-apply-combine strategy using **`group_by()`** and **`summarize()`** 
+    to generate summary statistics.
+    
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 :::::::::::::::::::::::::::::::::::::::: questions
 
-- How can I select specific rows and/or columns from a dataframe?
-- How can I combine multiple commands into a single command?
-- How can I create new columns or remove existing columns from a dataframe?
+-   How can I select specific rows and columns from a tibble using dplyr?
+-   How does the pipe operator **`(%\>%)`** help in combining multiple commands 
+    into a single workflow?
+-   What is the advantage of using **`mutate()`** for creating new variables, and 
+    how does it work?
+-   How can I summarize my data by grouping observations and applying summary 
+    statistics with dplyr?
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
-**`dplyr`** is a package for making tabular data wrangling easier by using a
-limited set of functions that can be combined to extract and summarize insights
-from your data.
+**`dplyr`** is a powerful and intuitive package in **`R`** designed to make data 
+manipulation both easy and efficient. It is part of the tidyverse ecosystem, which 
+emphasizes readable, consistent syntax for working with data. We're going to learn 
+some of the most common **`dplyr`** functions:
 
-Like **`readr`**, **`dplyr`** is a part of the tidyverse. These packages were loaded
-in R's memory when we called `library(tidyverse)` earlier.
+-   `select()`: subset columns
+-   `filter()`: subset rows on conditions
+-   `mutate()`: create new columns by using information from other columns
+-   `group_by()` and `summarize()`: create summary statistics on grouped data
+-   `arrange()`: sort results
+-   `count()`: count discrete values
 
-:::::::::::::::::::::::::::::::::::::::::  callout
+As covered in "Starting with Data", **`dplyr`** is also part of the tidyverse and 
+will be loaded in R's memory when we call `library(tidyverse)`.
+
+:::::::::::::::::::::::::::::::::::::::: callout
 
 ## Note
-
-The packages in the tidyverse, namely **`dplyr`**, **`tidyr`** and **`ggplot2`**
+The packages in the tidyverse, namely **`dplyr`**, **`tidyr`** and **`ggplot2`** 
 accept both the British (e.g. *summarise*) and American (e.g. *summarize*) spelling
-variants of different function and option names. For this lesson, we utilize
-the American spellings of different functions; however, feel free to use
-the regional variant for where you are teaching.
+variants of different function and option names. For this lesson, we utilize the 
+American spellings of different functions; however, feel free to use either whichever 
+variant feels best for you!
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
-## What is an R package?
-
-The package **`dplyr`** provides easy tools for the most common data
-wrangling tasks. It is built to work directly with dataframes, with many
-common tasks optimized by being written in a compiled language (C++) (not all R
-packages are written in R!).
-
-There are also packages available for a wide range of tasks including building plots
-(**`ggplot2`**, which we'll see later), downloading data from the NCBI database, or
-performing statistical analysis on your data set. Many packages such as these are
-housed on, and downloadable from, the **C**omprehensive **R** **A**rchive **N**etwork
-(CRAN) using `install.packages`. This function makes the package accessible by your R
-installation with the command `library()`, as you did with `tidyverse` earlier.
-
-To easily access the documentation for a package within R or RStudio, use
-`help(package = "package_name")`.
-
-To learn more about **`dplyr`** after the workshop, you may want to check out this
-[handy data transformation with **`dplyr`** cheatsheet](https://github.com/rstudio/cheatsheets/blob/main/data-transformation.pdf).
-
-:::::::::::::::::::::::::::::::::::::::::  callout
-
-## Note
-
-There are alternatives to the `tidyverse` packages for data wrangling, including
-the package [`data.table`](https://rdatatable.gitlab.io/data.table/). See this
-[comparison](https://mgimond.github.io/rug_2019_12/Index.html)
-for example to get a sense of the differences between using `base`, `tidyverse`, and
-`data.table`.
-
-::::::::::::::::::::::::::::::::::::::::::::::::::
-
-## Learning **`dplyr`**
-
-To make sure everyone will use the same dataset for this lesson, we'll read
-again the SAFI dataset that we downloaded earlier.
-
+To begin working with **`dplyr`**, let's start by loading in the packages and data 
+set:
 
 ``` r
-## load the tidyverse
+#load packages
 library(tidyverse)
 library(here)
-
-interviews <- read_csv(here("data", "SAFI_clean.csv"), na = "NULL")
-
-## inspect the data
-interviews
-
-## preview the data
-# view(interviews)
 ```
 
-We're going to learn some of the most common **`dplyr`** functions:
-
-- `select()`: subset columns
-- `filter()`: subset rows on conditions
-- `mutate()`: create new columns by using information from other columns
-- `group_by()` and `summarize()`: create summary statistics on grouped data
-- `arrange()`: sort results
-- `count()`: count discrete values
-
-## Selecting columns and filtering rows
-
-To select columns of a dataframe, use `select()`. The first argument to this
-function is the dataframe (`interviews`), and the subsequent arguments are the
-columns to keep, separated by commas. Alternatively, if you are selecting
-columns adjacent to each other, you can use a `:` to select a range of columns,
-read as "select columns from \_\_\_ to \_\_\_." You may have done something similar in
-the past using subsetting. `select()` is essentially doing the same thing as
-subsetting, using a package (`dplyr`) instead of R's base functions.
-
-
-``` r
-# to select columns throughout the dataframe
-select(interviews, village, no_membrs, months_lack_food)
-# to do the same thing with subsetting
-interviews[c("village","no_membrs","months_lack_food")]
-# to select a series of connected columns
-select(interviews, village:respondent_wall_type)
-```
-
-To choose rows based on specific criteria, we can use the `filter()` function.
-The argument after the dataframe is the condition we want our final
-dataframe to adhere to (e.g. village name is Chirodzo):
-
-
-``` r
-# filters observations where village name is "Chirodzo"
-filter(interviews, village == "Chirodzo")
-```
-
-``` output
-# A tibble: 39 × 14
-   key_ID village  interview_date      no_membrs years_liv respondent_wall_type
-    <dbl> <chr>    <dttm>                  <dbl>     <dbl> <chr>               
- 1      8 Chirodzo 2016-11-16 00:00:00        12        70 burntbricks         
- 2      9 Chirodzo 2016-11-16 00:00:00         8         6 burntbricks         
- 3     10 Chirodzo 2016-12-16 00:00:00        12        23 burntbricks         
- 4     34 Chirodzo 2016-11-17 00:00:00         8        18 burntbricks         
- 5     35 Chirodzo 2016-11-17 00:00:00         5        45 muddaub             
- 6     36 Chirodzo 2016-11-17 00:00:00         6        23 sunbricks           
- 7     37 Chirodzo 2016-11-17 00:00:00         3         8 burntbricks         
- 8     43 Chirodzo 2016-11-17 00:00:00         7        29 muddaub             
- 9     44 Chirodzo 2016-11-17 00:00:00         2         6 muddaub             
-10     45 Chirodzo 2016-11-17 00:00:00         9         7 muddaub             
-# ℹ 29 more rows
-# ℹ 8 more variables: rooms <dbl>, memb_assoc <chr>, affect_conflicts <chr>,
-#   liv_count <dbl>, items_owned <chr>, no_meals <dbl>, months_lack_food <chr>,
-#   instanceID <chr>
-```
-
-You may also have noticed that the output from these call doesn't run off the
-screen anymore. It's one of the advantages of `tbl_df` (also called tibble), 
-the central data class in the tidyverse, compared to normal dataframes in R.
-
-We can also specify multiple conditions within the `filter()` function. We can
-combine conditions using either "and" or "or" statements. In an "and"
-statement, an observation (row) must meet **every** criteria to be included
-in the resulting dataframe. To form "and" statements within dplyr, we can  pass
-our desired conditions as arguments in the `filter()` function, separated by
-commas:
-
-
-``` r
-# filters observations with "and" operator (comma)
-# output dataframe satisfies ALL specified conditions
-filter(interviews, village == "Chirodzo",
-                   rooms > 1,
-                   no_meals > 2)
-```
-
-``` output
-# A tibble: 10 × 14
-   key_ID village  interview_date      no_membrs years_liv respondent_wall_type
-    <dbl> <chr>    <dttm>                  <dbl>     <dbl> <chr>               
- 1     10 Chirodzo 2016-12-16 00:00:00        12        23 burntbricks         
- 2     49 Chirodzo 2016-11-16 00:00:00         6        26 burntbricks         
- 3     52 Chirodzo 2016-11-16 00:00:00        11        15 burntbricks         
- 4     56 Chirodzo 2016-11-16 00:00:00        12        23 burntbricks         
- 5     65 Chirodzo 2016-11-16 00:00:00         8        20 burntbricks         
- 6     66 Chirodzo 2016-11-16 00:00:00        10        37 burntbricks         
- 7     67 Chirodzo 2016-11-16 00:00:00         5        31 burntbricks         
- 8     68 Chirodzo 2016-11-16 00:00:00         8        52 burntbricks         
- 9    199 Chirodzo 2017-06-04 00:00:00         7        17 burntbricks         
-10    200 Chirodzo 2017-06-04 00:00:00         8        20 burntbricks         
-# ℹ 8 more variables: rooms <dbl>, memb_assoc <chr>, affect_conflicts <chr>,
-#   liv_count <dbl>, items_owned <chr>, no_meals <dbl>, months_lack_food <chr>,
-#   instanceID <chr>
-```
-
-We can also form "and" statements with the `&` operator instead of commas:
-
-
-``` r
-# filters observations with "&" logical operator
-# output dataframe satisfies ALL specified conditions
-filter(interviews, village == "Chirodzo" &
-                   rooms > 1 &
-                   no_meals > 2)
-```
-
-``` output
-# A tibble: 10 × 14
-   key_ID village  interview_date      no_membrs years_liv respondent_wall_type
-    <dbl> <chr>    <dttm>                  <dbl>     <dbl> <chr>               
- 1     10 Chirodzo 2016-12-16 00:00:00        12        23 burntbricks         
- 2     49 Chirodzo 2016-11-16 00:00:00         6        26 burntbricks         
- 3     52 Chirodzo 2016-11-16 00:00:00        11        15 burntbricks         
- 4     56 Chirodzo 2016-11-16 00:00:00        12        23 burntbricks         
- 5     65 Chirodzo 2016-11-16 00:00:00         8        20 burntbricks         
- 6     66 Chirodzo 2016-11-16 00:00:00        10        37 burntbricks         
- 7     67 Chirodzo 2016-11-16 00:00:00         5        31 burntbricks         
- 8     68 Chirodzo 2016-11-16 00:00:00         8        52 burntbricks         
- 9    199 Chirodzo 2017-06-04 00:00:00         7        17 burntbricks         
-10    200 Chirodzo 2017-06-04 00:00:00         8        20 burntbricks         
-# ℹ 8 more variables: rooms <dbl>, memb_assoc <chr>, affect_conflicts <chr>,
-#   liv_count <dbl>, items_owned <chr>, no_meals <dbl>, months_lack_food <chr>,
-#   instanceID <chr>
-```
-
-In an "or" statement, observations must meet *at least one* of the specified conditions.
-To form "or" statements we use the logical operator for "or," which is the vertical bar (|):
-
-
-``` r
-# filters observations with "|" logical operator
-# output dataframe satisfies AT LEAST ONE of the specified conditions
-filter(interviews, village == "Chirodzo" | village == "Ruaca")
-```
-
-``` output
-# A tibble: 88 × 14
-   key_ID village  interview_date      no_membrs years_liv respondent_wall_type
-    <dbl> <chr>    <dttm>                  <dbl>     <dbl> <chr>               
- 1      8 Chirodzo 2016-11-16 00:00:00        12        70 burntbricks         
- 2      9 Chirodzo 2016-11-16 00:00:00         8         6 burntbricks         
- 3     10 Chirodzo 2016-12-16 00:00:00        12        23 burntbricks         
- 4     23 Ruaca    2016-11-21 00:00:00        10        20 burntbricks         
- 5     24 Ruaca    2016-11-21 00:00:00         6         4 burntbricks         
- 6     25 Ruaca    2016-11-21 00:00:00        11         6 burntbricks         
- 7     26 Ruaca    2016-11-21 00:00:00         3        20 burntbricks         
- 8     27 Ruaca    2016-11-21 00:00:00         7        36 burntbricks         
- 9     28 Ruaca    2016-11-21 00:00:00         2         2 muddaub             
-10     29 Ruaca    2016-11-21 00:00:00         7        10 burntbricks         
-# ℹ 78 more rows
-# ℹ 8 more variables: rooms <dbl>, memb_assoc <chr>, affect_conflicts <chr>,
-#   liv_count <dbl>, items_owned <chr>, no_meals <dbl>, months_lack_food <chr>,
-#   instanceID <chr>
-```
-
-## Pipes
-
-What if you want to select and filter at the same time? There are three
-ways to do this: use intermediate steps, nested functions, or pipes.
-
-With intermediate steps, you create a temporary dataframe and use
-that as input to the next function, like this:
-
-
-``` r
-interviews2 <- filter(interviews, village == "Chirodzo")
-interviews_ch <- select(interviews2, village:respondent_wall_type)
-```
-
-This is readable, but can clutter up your workspace with lots of objects that
-you have to name individually. With multiple steps, that can be hard to keep
-track of.
-
-You can also nest functions (i.e. one function inside of another), like this:
-
-
-``` r
-interviews_ch <- select(filter(interviews, village == "Chirodzo"),
-                         village:respondent_wall_type)
-```
-
-This is handy, but can be difficult to read if too many functions are nested, as
-R evaluates the expression from the inside out (in this case, filtering, then
-selecting).
-
-The last option, *pipes*, are a recent addition to R. Pipes let you take the
-output of one function and send it directly to the next, which is useful when
-you need to do many things to the same dataset. There are two Pipes in R: 1) `%>%` (called magrittr pipe; made available via the **`magrittr`** package, installed automatically with
-**`dplyr`**) or 2) `|>` (called native R pipe and it comes preinstalled with R v4.1.0 onwards). Both the pipes are, by and large, function similarly with a few differences (For more information, check: https://www.tidyverse.org/blog/2023/04/base-vs-magrittr-pipe/). The choice of which pipe to be used can be changed in the Global settings in R studio and once that is done, you can type the pipe with:
-
-- <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>M</kbd> if you have a PC or <kbd>Cmd</kbd> +
-  <kbd>Shift</kbd> + <kbd>M</kbd> if you have a Mac.
-
-
-``` r
-# the following example is run using magrittr pipe but the output will be same with the native pipe
-interviews %>%
-    filter(village == "Chirodzo") %>%
-    select(village:respondent_wall_type)
-```
-
-``` output
-# A tibble: 39 × 5
-   village  interview_date      no_membrs years_liv respondent_wall_type
-   <chr>    <dttm>                  <dbl>     <dbl> <chr>               
- 1 Chirodzo 2016-11-16 00:00:00        12        70 burntbricks         
- 2 Chirodzo 2016-11-16 00:00:00         8         6 burntbricks         
- 3 Chirodzo 2016-12-16 00:00:00        12        23 burntbricks         
- 4 Chirodzo 2016-11-17 00:00:00         8        18 burntbricks         
- 5 Chirodzo 2016-11-17 00:00:00         5        45 muddaub             
- 6 Chirodzo 2016-11-17 00:00:00         6        23 sunbricks           
- 7 Chirodzo 2016-11-17 00:00:00         3         8 burntbricks         
- 8 Chirodzo 2016-11-17 00:00:00         7        29 muddaub             
- 9 Chirodzo 2016-11-17 00:00:00         2         6 muddaub             
-10 Chirodzo 2016-11-17 00:00:00         9         7 muddaub             
-# ℹ 29 more rows
+``` error
+Error in library(here): there is no package called 'here'
 ```
 
 ``` r
-#interviews |>
-#   filter(village == "Chirodzo") |>
-#   select(village:respondent_wall_type)
+#read in data
+data <- read_csv(here("data", "checkin_data.csv"))
 ```
 
-In the above code, we use the pipe to send the `interviews` dataset first
-through `filter()` to keep rows where `village` is "Chirodzo", then through
-`select()` to keep only the columns from `village` to `respondent_wall_type`. Since `%>%`
-takes the object on its left and passes it as the first argument to the function
-on its right, we don't need to explicitly include the dataframe as an argument
-to the `filter()` and `select()` functions any more.
+``` error
+Error in here("data", "checkin_data.csv"): could not find function "here"
+```
 
-Some may find it helpful to read the pipe like the word "then". For instance,
-in the above example, we take the dataframe `interviews`, *then* we `filter`
-for rows with `village == "Chirodzo"`, *then* we `select` columns `village:respondent_wall_type`.
-The **`dplyr`** functions by themselves are somewhat simple,
-but by combining them into linear workflows with the pipe, we can accomplish
-more complex data wrangling operations.
+## Selecting Columns
 
-If we want to create a new object with this smaller version of the data, we
-can assign it a new name:
+The first function we will be covering is the **`select()`** function! This 
+function allows us to select specific columns of our data set and accepts two primary 
+types of arguments: the original data set, and the column(s) to isolate.
+
+In our case, for example, we are interested in seeing ONLY the precinct id's in 
+our data set, so our arguments will be `data` and `precinct`:
+
+``` r
+#selects JUST the precinct column
+select(data, precinct)
+```
+
+``` error
+Error in UseMethod("select"): no applicable method for 'select' applied to an object of class "function"
+```
+
+Using the **`select`** function, you can also select MULTIPLE columns. This can 
+be particularly helpful with larger data sets. Theoretically, this function can 
+be performed using subsetting instead of the **`select`** function, but it's best 
+practice to use dplyr functions when possible:
+
+``` r
+#selects the precinct column AND the checkin_time column
+select(data, precinct, checkin_time)
+```
+
+``` error
+Error in UseMethod("select"): no applicable method for 'select' applied to an object of class "function"
+```
+
+In some cases, you may want to select multiple, adjacent columns. Instead of writing 
+out each individual column name directly, they can be selected with a **`:`**, as 
+seen below:
+
+``` r
+#selects all columns from checkin_time to precinct
+select(data, checkin_time:precinct)
+```
+
+``` error
+Error in UseMethod("select"): no applicable method for 'select' applied to an object of class "function"
+```
+
+You can see a visualized example of the **`select()`** function on [tidy data tutor](https://tidydatatutor.com/vis.html#code=library%28dplyr%29%0Alibrary%28palmerpenguins%29%0A%0Aset.seed%282021-12-03%29%0A%0Asample_penguins%20%3C-%20penguins%20%25%3E%25%0A%20%20group_by%28species%29%20%25%3E%25%20%0A%20%20sample_n%283%29%20%25%3E%25%20%0A%20%20select%28species,%20island,%20bill_length_mm%29%20%25%3E%25%20%0A%20%20ungroup%28%29%0A%0Asample_penguins%20%25%3E%25%20%0A%20%20select%28species,%20bill_length_mm%29&d=2025-04-18&lang=r&v=v1)
+
+## Filtering Rows
+
+Our next function we will be covering is the **`filter()`** function! This function 
+allows us to choose rows based on specific criteria, and accepts two arguments: 
+the original data set, and the condition to select the rows based off of. In this 
+case, we ONLY want rows where the precinct is "PRECINCT_001":
 
 
 ``` r
-interviews_ch <- interviews %>%
-    filter(village == "Chirodzo") %>%
-    select(village:respondent_wall_type)
-
-interviews_ch
+#filters rows where the precinct is "PRECINCT_001"
+filter(data, precinct == "PRECINCT_001")
 ```
 
-``` output
-# A tibble: 39 × 5
-   village  interview_date      no_membrs years_liv respondent_wall_type
-   <chr>    <dttm>                  <dbl>     <dbl> <chr>               
- 1 Chirodzo 2016-11-16 00:00:00        12        70 burntbricks         
- 2 Chirodzo 2016-11-16 00:00:00         8         6 burntbricks         
- 3 Chirodzo 2016-12-16 00:00:00        12        23 burntbricks         
- 4 Chirodzo 2016-11-17 00:00:00         8        18 burntbricks         
- 5 Chirodzo 2016-11-17 00:00:00         5        45 muddaub             
- 6 Chirodzo 2016-11-17 00:00:00         6        23 sunbricks           
- 7 Chirodzo 2016-11-17 00:00:00         3         8 burntbricks         
- 8 Chirodzo 2016-11-17 00:00:00         7        29 muddaub             
- 9 Chirodzo 2016-11-17 00:00:00         2         6 muddaub             
-10 Chirodzo 2016-11-17 00:00:00         9         7 muddaub             
-# ℹ 29 more rows
+``` error
+Error in UseMethod("filter"): no applicable method for 'filter' applied to an object of class "function"
 ```
 
-Note that the final dataframe (`interviews_ch`) is the leftmost part of this
-expression.
+You can also use comparison operators within **`filter()`** arguments! This includes 
+less-than (<), less-than or equal-to (<=), greater-than (>), greater-than or equal-to (>=),
+or not-equal-to (!=).
+
+For example, you could filter for all rows where the check-in length is less-than 
+or equal-to 20 seconds:
+
+``` r
+#filters rows with the "less-than or equal-to"/"<=" operator
+filter(data, checkin_length <= 20)
+```
+
+``` error
+Error in UseMethod("filter"): no applicable method for 'filter' applied to an object of class "function"
+```
+
+Similarly to the **`select()`** function, the **`filter()`** function also allows 
+us to specify multiple conditions. However, instead of splitting these by commas, 
+conditions are combined using ‘and’, ‘or’, or comparison statements. 
+ 
+In an ‘and’ statement, an observation (row) must meet *all* criteria to be included 
+in the resulting tibble. To form ‘and’ statements within dplyr, we can pass our 
+desired conditions as arguments in the **`filter()`** function, separated by an 
+ampersand (&). 
+
+Below, let's filter rows that include "PRECINCT_001" as the precinct *and* "DEVICE_002" 
+as the device:
+
+``` r
+#filters rows with the "and"/"&" logical operator
+filter(data, precinct == "PRECINCT_001" & device == "DEVICE_002")
+```
+
+``` error
+Error in UseMethod("filter"): no applicable method for 'filter' applied to an object of class "function"
+```
+
+In an ‘or’ statement, an observation (row) must meet *at least one* criteria to 
+be included in the resulting tibble. To form ‘or’ statements within dplyr, we can pass our 
+desired conditions as arguments in the **`filter()`** function, separated by a 
+vertical bar (|). 
+
+Below, let's filter rows that include "PRECINCT_001" *or* "PRECINCT_002" as the 
+precinct:
+
+``` r
+#filters rows with the "or"/"|" logical operator
+filter(data, precinct == "PRECINCT_001" | precinct == "PRECINCT_002")
+```
+
+``` error
+Error in UseMethod("filter"): no applicable method for 'filter' applied to an object of class "function"
+```
+
+
+you can see a visualized examples of the **`filter()`** function on [tidy data tutor](https://tidydatatutor.com/vis.html#code=library%28dplyr%29%0Alibrary%28palmerpenguins%29%0A%0Aset.seed%282021-12-03%29%0A%0Asample_penguins%20%3C-%20penguins%20%25%3E%25%0A%20%20group_by%28species%29%20%25%3E%25%20%0A%20%20sample_n%283%29%20%25%3E%25%20%0A%20%20select%28species,%20bill_length_mm%29%20%25%3E%25%20%0A%20%20ungroup%28%29%0A%0Asample_penguins%20%25%3E%25%20%0A%20%20filter%28bill_length_mm%20%3E%2045%29&d=2025-04-18&lang=r&v=v1)
+
+## Using Pipes
+
+In many cases, you will want to apply multiple functions at the same time! Within 
+dplyr, there are three ways to do this.
+
+1. Intermediate Steps:
+Using this method, you apply the first function to your data and save the result 
+as a new object. After saving, the second function is applied to your new object
+instead of the original data. 
+While this method is easy to understand, it can create many extra, unnecessary 
+objects in your R environment.
+
+``` r
+#step 1: apply filter function and save it to a new object (filtered_data)
+filtered_data <- filter(data, precinct == "PRECINCT_005")
+```
+
+``` error
+Error in UseMethod("filter"): no applicable method for 'filter' applied to an object of class "function"
+```
+
+``` r
+#step 2: apply select function on the filtered_data object
+select(filtered_data, precinct, checkin_time)
+```
+
+``` error
+Error: object 'filtered_data' not found
+```
+
+2. Nested Functions: 
+Instead of saving intermediate results, you can instead put your first function 
+inside the second. This is called nesting, and, while it works, can become confusing 
+if more than two functions are put together.
+
+``` r
+# Do it all in one go, nesting the functions
+select(filter(data, precinct == "PRECINCT_005"), precinct, checkin_time)
+```
+
+``` error
+Error in UseMethod("filter"): no applicable method for 'filter' applied to an object of class "function"
+```
+
+3. Using Pipes: 
+**`Pipes`** allow you to connect your commands in a simple, step-by-step way. These 
+let you take the output of one function and send it directly to the next, which is 
+useful when you need to do many things to the same data set! 
+When analyzing code with pipes, you can think of it as the word “then". 
+
+``` r
+#takes the data THEN applies the filter function THEN applies the select function
+data %>%
+  filter(precinct == "PRECINCT_005") %>%
+  select(precinct, checkin_time)
+```
+
+``` error
+Error in UseMethod("filter"): no applicable method for 'filter' applied to an object of class "function"
+```
+
+In the above code, you may have noticed that the `data` data set was not included 
+as an argument in either of the functions. Since pipes take the object on its left 
+and pass it as the first argument to the function on its right, we don't need to 
+explicitly include the tibble as an argument to the `filter()` and `select()` 
+functions anymore.
+
+In R, there are two main types of pipe operators: 
+1. **`|>`**: called the *native* pipe — included with base **`R`**.
+2. **`%>%`**: called the *magrittr* pipe — installed automatically with **`dplyr`**. 
+   This pipe is the most common, and what we will be using throughout this lesson.
+
+Both pipes behave the exact same way, so the choice of which one to use is a matter 
+of taste.
 
 :::::::::::::::::::::::::::::::::::::::  challenge
 
 ## Exercise
 
-Using pipes, subset the `interviews` data to include interviews
-where respondents were members of an irrigation association
-(`memb_assoc`) and retain only the columns `affect_conflicts`,
-`liv_count`, and `no_meals`.
+Using pipes, filter the `data` data set to include only observations where the 
+`device` is `"DEVICE_738"` select only the columns `precinct`, `checkin_time`, 
+and `device`.
 
 :::::::::::::::  solution
 
@@ -396,459 +308,235 @@ where respondents were members of an irrigation association
 
 
 ``` r
-interviews %>%
-    filter(memb_assoc == "yes") %>%
-    select(affect_conflicts, liv_count, no_meals)
+data %>%
+  filter(device == "DEVICE_738") %>%
+  select(precinct, checkin_time, device)
 ```
 
-``` output
-# A tibble: 33 × 3
-   affect_conflicts liv_count no_meals
-   <chr>                <dbl>    <dbl>
- 1 once                     3        2
- 2 never                    2        2
- 3 never                    2        3
- 4 once                     3        2
- 5 frequently               1        3
- 6 more_once                5        2
- 7 more_once                3        2
- 8 more_once                2        3
- 9 once                     3        3
-10 never                    3        3
-# ℹ 23 more rows
+``` error
+Error in UseMethod("filter"): no applicable method for 'filter' applied to an object of class "function"
 ```
-
 :::::::::::::::::::::::::
+
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
-## Mutate
-
-Frequently you'll want to create new columns based on the values in existing
-columns, for example to do unit conversions, or to find the ratio of values in
-two columns. For this we'll use `mutate()`.
-
-We might be interested in the ratio of number of household members
-to rooms used for sleeping (i.e. avg number of people per room):
 
 
-``` r
-interviews %>%
-    mutate(people_per_room = no_membrs / rooms)
-```
+## Split-Apply-Combine Data Analysis
 
-``` output
-# A tibble: 131 × 15
-   key_ID village  interview_date      no_membrs years_liv respondent_wall_type
-    <dbl> <chr>    <dttm>                  <dbl>     <dbl> <chr>               
- 1      1 God      2016-11-17 00:00:00         3         4 muddaub             
- 2      2 God      2016-11-17 00:00:00         7         9 muddaub             
- 3      3 God      2016-11-17 00:00:00        10        15 burntbricks         
- 4      4 God      2016-11-17 00:00:00         7         6 burntbricks         
- 5      5 God      2016-11-17 00:00:00         7        40 burntbricks         
- 6      6 God      2016-11-17 00:00:00         3         3 muddaub             
- 7      7 God      2016-11-17 00:00:00         6        38 muddaub             
- 8      8 Chirodzo 2016-11-16 00:00:00        12        70 burntbricks         
- 9      9 Chirodzo 2016-11-16 00:00:00         8         6 burntbricks         
-10     10 Chirodzo 2016-12-16 00:00:00        12        23 burntbricks         
-# ℹ 121 more rows
-# ℹ 9 more variables: rooms <dbl>, memb_assoc <chr>, affect_conflicts <chr>,
-#   liv_count <dbl>, items_owned <chr>, no_meals <dbl>, months_lack_food <chr>,
-#   instanceID <chr>, people_per_room <dbl>
-```
+Many data analysis tasks follow a pattern known as *split-apply-combine*:
+1. **Split** the data into groups.
+2. **Apply** some analysis or calculation to each group.
+3. **Combine** the results into a summary
 
-We may be interested in investigating whether being a member of an
-irrigation association had any effect on the ratio of household members
-to rooms. To look at this relationship, we will first remove
-data from our dataset where the respondent didn't answer the
-question of whether they were a member of an irrigation association.
-These cases are recorded as "NULL" in the dataset.
+The **`dplyr`** package makes this easy with two main functions:
+- `group_by()` to define how you want to split the data.
+- `summarize()` to apply one or more calculations on each group and return a summary.
 
-To remove these cases, we could insert a `filter()` in the chain:
+### `group_by()`
 
+The **``group_by()`** function allows us to treat parts of our data set as separate 
+groups so other functions can work within each group instead of on the entire data 
+set. This function accepts the one or more columns to group-by as arguments! 
+
+Below, we will be grouping the data by location, and filtering the rows to only 
+include the check-in(s) with the longest check-in length for each location:
 
 ``` r
-interviews %>%
-    filter(!is.na(memb_assoc)) %>%
-    mutate(people_per_room = no_membrs / rooms)
+#groups the data by location and applies filter
+data %>%
+  group_by(location) %>%
+  filter(checkin_length == max(checkin_length))
 ```
 
-``` output
-# A tibble: 92 × 15
-   key_ID village  interview_date      no_membrs years_liv respondent_wall_type
-    <dbl> <chr>    <dttm>                  <dbl>     <dbl> <chr>               
- 1      2 God      2016-11-17 00:00:00         7         9 muddaub             
- 2      7 God      2016-11-17 00:00:00         6        38 muddaub             
- 3      8 Chirodzo 2016-11-16 00:00:00        12        70 burntbricks         
- 4      9 Chirodzo 2016-11-16 00:00:00         8         6 burntbricks         
- 5     10 Chirodzo 2016-12-16 00:00:00        12        23 burntbricks         
- 6     12 God      2016-11-21 00:00:00         7        20 burntbricks         
- 7     13 God      2016-11-21 00:00:00         6         8 burntbricks         
- 8     15 God      2016-11-21 00:00:00         5        30 sunbricks           
- 9     21 God      2016-11-21 00:00:00         8        20 burntbricks         
-10     24 Ruaca    2016-11-21 00:00:00         6         4 burntbricks         
-# ℹ 82 more rows
-# ℹ 9 more variables: rooms <dbl>, memb_assoc <chr>, affect_conflicts <chr>,
-#   liv_count <dbl>, items_owned <chr>, no_meals <dbl>, months_lack_food <chr>,
-#   instanceID <chr>, people_per_room <dbl>
+``` error
+Error in UseMethod("group_by"): no applicable method for 'group_by' applied to an object of class "function"
 ```
 
-The `!` symbol negates the result of the `is.na()` function. Thus, if `is.na()`
-returns a value of `TRUE` (because the `memb_assoc` is missing), the `!` symbol
-negates this and says we only want values of `FALSE`, where `memb_assoc` **is
-not** missing.
+Additionally, when multiple columns are provided, **``group_by()`** goes from 
+left-to-right, grouping by the first column, then within each group by the second, 
+and so on!
 
-:::::::::::::::::::::::::::::::::::::::  challenge
-
-## Exercise
-
-Create a new dataframe from the `interviews` data that meets the following
-criteria: contains only the `village` column and a new column called
-`total_meals` containing a value that is equal to the total number of meals
-served in the household per day on average (`no_membrs` times `no_meals`).
-Only the rows where `total_meals` is greater than 20 should be shown in the
-final dataframe.
-
-**Hint**: think about how the commands should be ordered to produce this data
-frame!
-
-:::::::::::::::  solution
-
-## Solution
-
+Below, we will be doing the same calculation that we did above, but instead of 
+grouping only by location, we will be grouping by location *and* device:
 
 ``` r
-interviews_total_meals <- interviews %>%
-    mutate(total_meals = no_membrs * no_meals) %>%
-    filter(total_meals > 20) %>%
-    select(village, total_meals)
+#groups the data by location and applies filter
+data %>%
+  group_by(location, device) %>%
+  filter(checkin_length == max(checkin_length))
 ```
 
-:::::::::::::::::::::::::
+``` error
+Error in UseMethod("group_by"): no applicable method for 'group_by' applied to an object of class "function"
+```
 
-::::::::::::::::::::::::::::::::::::::::::::::::::
+As you can see, there are additional rows, since we are looking at the longest check-in
+times for each device within each location, instead of just within each location!
 
-## Split-apply-combine data analysis and the summarize() function
-
-Many data analysis tasks can be approached using the *split-apply-combine*
-paradigm: split the data into groups, apply some analysis to each group, and
-then combine the results. **`dplyr`** makes this very easy through the use of
-the `group_by()` function.
-
-### The `summarize()` function
-
-`group_by()` is often used together with `summarize()`, which collapses each
-group into a single-row summary of that group.  `group_by()` takes as arguments
-the column names that contain the **categorical** variables for which you want
-to calculate the summary statistics. So to compute the average household size by
-village:
-
+After completing analysis, you may want to remove grouping! To do so, you can use 
+the **`ungroup()`** function:
 
 ``` r
-interviews %>%
-    group_by(village) %>%
-    summarize(mean_no_membrs = mean(no_membrs))
+data %>%
+  group_by(location, device) %>% 
+  filter(checkin_length == max(checkin_length)) %>%
+  ungroup()
 ```
 
-``` output
-# A tibble: 3 × 2
-  village  mean_no_membrs
-  <chr>             <dbl>
-1 Chirodzo           7.08
-2 God                6.86
-3 Ruaca              7.57
+``` error
+Error in UseMethod("group_by"): no applicable method for 'group_by' applied to an object of class "function"
 ```
 
-You can also group by multiple columns:
+The final table will no longer be considered “grouped”, which can be helpful if
+you plan to do further operations that don’t rely on grouping.
 
+### `summarize()`
+
+The **``summarize()`** function is often used alongside **``group_by()`**, as it 
+allows us to reduce a group of rows to a single row per group. This function accepts 
+one or more expressions that compute summary statistics as arguments!
+
+Some common **``summarize()`** summary functions include:
+- mean(): calculates the average of a numeric column
+- max()/min(): returns the maximum or minimum of a group
+- n(): counts the number of rows in a group
+- n_distinct(): counts the number of unique values in a column
+
+Suppose we want to see how many total check-ins there were for each precinct in 
+our data set. We can do this by grouping the data by the `precinct` column using 
+**``group_by()`** and then using the **``summarize()`** function to count each 
+row within each precinct group, as seen below:
 
 ``` r
-interviews %>%
-    group_by(village, memb_assoc) %>%
-    summarize(mean_no_membrs = mean(no_membrs))
+data %>%
+  group_by(precinct) %>%
+  summarize(total_checkins = n())
 ```
 
-``` output
-`summarise()` has grouped output by 'village'. You can override using the
-`.groups` argument.
+``` error
+Error in UseMethod("group_by"): no applicable method for 'group_by' applied to an object of class "function"
 ```
 
-``` output
-# A tibble: 9 × 3
-# Groups:   village [3]
-  village  memb_assoc mean_no_membrs
-  <chr>    <chr>               <dbl>
-1 Chirodzo no                   8.06
-2 Chirodzo yes                  7.82
-3 Chirodzo <NA>                 5.08
-4 God      no                   7.13
-5 God      yes                  8   
-6 God      <NA>                 6   
-7 Ruaca    no                   7.18
-8 Ruaca    yes                  9.5 
-9 Ruaca    <NA>                 6.22
-```
-
-Note that the output is a grouped tibble of nine rows by three columns 
-which is indicated by the by two first lines with the `#`.
-To obtain an ungrouped tibble, use the
-`ungroup` function:
-
+We can also apply **``summarize()`** on data that has been grouped by multiple 
+columns! Below, we will be grouping by precinct and device, allowing us to see how
+many check-ins occurred for each device within each precinct:
 
 ``` r
-interviews %>%
-    group_by(village, memb_assoc) %>%
-    summarize(mean_no_membrs = mean(no_membrs)) %>%
-    ungroup()
+data %>%
+  group_by(precinct, device) %>%
+  summarize(total_checkins = n())
 ```
 
-``` output
-`summarise()` has grouped output by 'village'. You can override using the
-`.groups` argument.
+``` error
+Error in UseMethod("group_by"): no applicable method for 'group_by' applied to an object of class "function"
 ```
 
-``` output
-# A tibble: 9 × 3
-  village  memb_assoc mean_no_membrs
-  <chr>    <chr>               <dbl>
-1 Chirodzo no                   8.06
-2 Chirodzo yes                  7.82
-3 Chirodzo <NA>                 5.08
-4 God      no                   7.13
-5 God      yes                  8   
-6 God      <NA>                 6   
-7 Ruaca    no                   7.18
-8 Ruaca    yes                  9.5 
-9 Ruaca    <NA>                 6.22
-```
-
-Notice that the second line with the `#` that previously indicated the grouping has 
-disappeared and we now only have a 9x3-tibble without grouping.
-When grouping both by `village` and `membr_assoc`, we see rows in our table for
-respondents who did not specify whether they were a member of an irrigation
-association. We can exclude those data from our table using a filter step.
-
+You’re not limited to a single summary statistic, either! For example, you might 
+want both the total number of check-ins *and* the number of unique devices for 
+each precinct. You can combine these in one **`summarize()`** call:
 
 ``` r
-interviews %>%
-    filter(!is.na(memb_assoc)) %>%
-    group_by(village, memb_assoc) %>%
-    summarize(mean_no_membrs = mean(no_membrs))
-```
-
-``` output
-`summarise()` has grouped output by 'village'. You can override using the
-`.groups` argument.
-```
-
-``` output
-# A tibble: 6 × 3
-# Groups:   village [3]
-  village  memb_assoc mean_no_membrs
-  <chr>    <chr>               <dbl>
-1 Chirodzo no                   8.06
-2 Chirodzo yes                  7.82
-3 God      no                   7.13
-4 God      yes                  8   
-5 Ruaca    no                   7.18
-6 Ruaca    yes                  9.5 
-```
-
-Once the data are grouped, you can also summarize multiple variables at the same
-time (and not necessarily on the same variable). For instance, we could add a
-column indicating the minimum household size for each village for each group
-(members of an irrigation association vs not):
-
-
-``` r
-interviews %>%
-    filter(!is.na(memb_assoc)) %>%
-    group_by(village, memb_assoc) %>%
-    summarize(mean_no_membrs = mean(no_membrs),
-              min_membrs = min(no_membrs))
-```
-
-``` output
-`summarise()` has grouped output by 'village'. You can override using the
-`.groups` argument.
-```
-
-``` output
-# A tibble: 6 × 4
-# Groups:   village [3]
-  village  memb_assoc mean_no_membrs min_membrs
-  <chr>    <chr>               <dbl>      <dbl>
-1 Chirodzo no                   8.06          4
-2 Chirodzo yes                  7.82          2
-3 God      no                   7.13          3
-4 God      yes                  8             5
-5 Ruaca    no                   7.18          2
-6 Ruaca    yes                  9.5           5
-```
-
-It is sometimes useful to rearrange the result of a query to inspect the values.
-For instance, we can sort on `min_membrs` to put the group with the smallest
-household first:
-
-
-``` r
-interviews %>%
-    filter(!is.na(memb_assoc)) %>%
-    group_by(village, memb_assoc) %>%
-    summarize(mean_no_membrs = mean(no_membrs),
-              min_membrs = min(no_membrs)) %>%
-    arrange(min_membrs)
-```
-
-``` output
-`summarise()` has grouped output by 'village'. You can override using the
-`.groups` argument.
-```
-
-``` output
-# A tibble: 6 × 4
-# Groups:   village [3]
-  village  memb_assoc mean_no_membrs min_membrs
-  <chr>    <chr>               <dbl>      <dbl>
-1 Chirodzo yes                  7.82          2
-2 Ruaca    no                   7.18          2
-3 God      no                   7.13          3
-4 Chirodzo no                   8.06          4
-5 God      yes                  8             5
-6 Ruaca    yes                  9.5           5
-```
-
-To sort in descending order, we need to add the `desc()` function. If we want to
-sort the results by decreasing order of minimum household size:
-
-
-``` r
-interviews %>%
-    filter(!is.na(memb_assoc)) %>%
-    group_by(village, memb_assoc) %>%
-    summarize(mean_no_membrs = mean(no_membrs),
-              min_membrs = min(no_membrs)) %>%
-    arrange(desc(min_membrs))
-```
-
-``` output
-`summarise()` has grouped output by 'village'. You can override using the
-`.groups` argument.
-```
-
-``` output
-# A tibble: 6 × 4
-# Groups:   village [3]
-  village  memb_assoc mean_no_membrs min_membrs
-  <chr>    <chr>               <dbl>      <dbl>
-1 God      yes                  8             5
-2 Ruaca    yes                  9.5           5
-3 Chirodzo no                   8.06          4
-4 God      no                   7.13          3
-5 Chirodzo yes                  7.82          2
-6 Ruaca    no                   7.18          2
-```
-
-### Counting
-
-When working with data, we often want to know the number of observations found
-for each factor or combination of factors. For this task, **`dplyr`** provides
-`count()`. For example, if we wanted to count the number of rows of data for
-each village, we would do:
-
-
-``` r
-interviews %>%
-    count(village)
-```
-
-``` output
-# A tibble: 3 × 2
-  village      n
-  <chr>    <int>
-1 Chirodzo    39
-2 God         43
-3 Ruaca       49
-```
-
-For convenience, `count()` provides the `sort` argument to get results in
-decreasing order:
-
-
-``` r
-interviews %>%
-    count(village, sort = TRUE)
-```
-
-``` output
-# A tibble: 3 × 2
-  village      n
-  <chr>    <int>
-1 Ruaca       49
-2 God         43
-3 Chirodzo    39
-```
-
-:::::::::::::::::::::::::::::::::::::::  challenge
-
-## Exercise
-
-How many households in the survey have an average of
-two meals per day? Three meals per day? Are there any other numbers
-of meals represented?
-
-:::::::::::::::  solution
-
-## Solution
-
-
-``` r
-interviews %>%
-   count(no_meals)
-```
-
-``` output
-# A tibble: 2 × 2
-  no_meals     n
-     <dbl> <int>
-1        2    52
-2        3    79
-```
-
-:::::::::::::::::::::::::
-
-Use `group_by()` and `summarize()` to find the mean, min, and max
-number of household members for each village. Also add the number of
-observations (hint: see `?n`).
-
-:::::::::::::::  solution
-
-## Solution
-
-
-``` r
-interviews %>%
-  group_by(village) %>%
+data %>%
+  group_by(precinct) %>%
   summarize(
-      mean_no_membrs = mean(no_membrs),
-      min_no_membrs = min(no_membrs),
-      max_no_membrs = max(no_membrs),
-      n = n()
+    total_checkins = n(),
+    unique_devices = n_distinct(device)
   )
 ```
 
-``` output
-# A tibble: 3 × 5
-  village  mean_no_membrs min_no_membrs max_no_membrs     n
-  <chr>             <dbl>         <dbl>         <dbl> <int>
-1 Chirodzo           7.08             2            12    39
-2 God                6.86             3            15    43
-3 Ruaca              7.57             2            19    49
+``` error
+Error in UseMethod("group_by"): no applicable method for 'group_by' applied to an object of class "function"
 ```
 
-:::::::::::::::::::::::::
+Additionally, if you need to exclude certain rows before summarizing, ensure you use 
+**`filter()`** before grouping. For example, to include only check-ins from a 
+specific location, you can do the following:
 
-What was the largest household interviewed in each month?
+``` r
+data %>%
+  filter(location == "LOCATION_001") %>%
+  group_by(precinct) %>%
+  summarize(total_checkins = n())
+```
+
+``` error
+Error in UseMethod("filter"): no applicable method for 'filter' applied to an object of class "function"
+```
+
+Additional examples of the **`group_by()`** and **`summarize()`** functions can 
+be found at [tidy data tutor](https://tidydatatutor.com/vis.html#code=library%28dplyr%29%0Alibrary%28palmerpenguins%29%0A%0Aset.seed%282021-12-03%29%0A%0Asample_penguins%20%3C-%20penguins%20%25%3E%25%0A%20%20group_by%28species%29%20%25%3E%25%20%0A%20%20sample_n%283%29%20%25%3E%25%20%0A%20%20select%28species,%20bill_length_mm%29%0A%0Asample_penguins%20%25%3E%25%20%0A%20%20summarise%28Avg_Bill_Length%20%3D%20mean%28bill_length_mm%29%29&d=2025-04-18&lang=r&v=v1)
+
+### `arrange()`
+
+After summarizing, you may want to sort your results. To do so, you can use the 
+**`arrange()`** function to reorder rows. For example, to list precincts from lowest
+to highest check-in counts, you can do the following:
+
+``` r
+data %>%
+  group_by(precinct) %>%
+  summarize(total_checkins = n()) %>%
+  arrange(total_checkins)
+```
+
+``` error
+Error in UseMethod("group_by"): no applicable method for 'group_by' applied to an object of class "function"
+```
+
+Or, to instead arrange from highest to lowest, include desc() around the **`arrange()`**
+attribute, as seen below:
+# ```{r arrange-desc, purl=FALSE}
+data %>%
+  group_by(precinct) %>%
+  summarize(total_checkins = n()) %>%
+  arrange(desc(total_checkins))
+```
+
+An additional example of the **`arrange()`** function can be found [at tidy data tutor](https://tidydatatutor.com/vis.html#code=library%28dplyr%29%0Alibrary%28palmerpenguins%29%0A%0Aset.seed%282021-12-03%29%0A%0Asample_penguins%20%3C-%20penguins%20%25%3E%25%0A%20%20group_by%28species%29%20%25%3E%25%20%0A%20%20sample_n%283%29%20%25%3E%25%20%0A%20%20select%28species,%20bill_length_mm%29%20%25%3E%25%20%0A%20%20ungroup%28%29%0A%0Asample_penguins%20%25%3E%25%20%0A%20%20arrange%28bill_length_mm%29&d=2025-04-18&lang=r&v=v1)
+
+### `count()`
+
+When working with data, we often want to know how many observations we have for 
+each factor or combination of factors. As you saw above, we were able to complete 
+this using the **`group_by()`** function, followed by the **`summarize()`** function.
+
+However, since this is such a common task, **`dplyr`** provides the **`count()`** 
+function to make this task much quicker and easier to write and perform!
+
+For example, if we want to count the number of check-ins for each precinct, instead 
+of grouping by precinct and summarizing using the `n()` function, we can do the 
+following:
+
+``` r
+data %>%
+    count(precinct)
+```
+
+``` error
+Error in UseMethod("count"): no applicable method for 'count' applied to an object of class "function"
+```
+
+Additionally, if you'd like your results sorted, instead of using the **`arrange()`**
+function, you can add "sort = TRUE" as an argument to the **`count()`** function, 
+as seen below:
+
+``` r
+data %>%
+    count(precinct, sort = TRUE)
+```
+
+``` error
+Error in UseMethod("count"): no applicable method for 'count' applied to an object of class "function"
+```
+
+:::::::::::::::::::::::::::::::::::::::  challenge
+
+## Exercise
+
+Using what you've learned above, determine how many check-ins were recorded for 
+each device. Which device had the highest number of check-ins?
 
 :::::::::::::::  solution
 
@@ -856,45 +544,148 @@ What was the largest household interviewed in each month?
 
 
 ``` r
-# if not already included, add month, year, and day columns
-library(lubridate) # load lubridate if not already loaded
-interviews %>%
-    mutate(month = month(interview_date),
-           day = day(interview_date),
-           year = year(interview_date)) %>%
-    group_by(year, month) %>%
-    summarize(max_no_membrs = max(no_membrs))
+data %>%
+    count(device, sort = TRUE)
 ```
 
-``` output
-`summarise()` has grouped output by 'year'. You can override using the
-`.groups` argument.
+``` error
+Error in UseMethod("count"): no applicable method for 'count' applied to an object of class "function"
 ```
 
-``` output
-# A tibble: 5 × 3
-# Groups:   year [2]
-   year month max_no_membrs
-  <dbl> <dbl>         <dbl>
-1  2016    11            19
-2  2016    12            12
-3  2017     4            17
-4  2017     5            15
-5  2017     6            15
+"DEVICE_255" has the highest number of check ins, with 898 recorded!
+
+:::::::::::::::::::::::::
+
+For "PRECINCT_007", find the device that recorded the least amount of check-ins.
+
+**Hint:** ensure you filter your data before applying split-apply-combine!
+
+:::::::::::::::  solution
+
+## Solution
+
+
+``` r
+data %>%
+  filter(precinct == "PRECINCT_007") %>%
+  group_by(device) %>%
+  summarize(total_checkins = n()) %>%
+  arrange(desc(total_checkins))
 ```
+
+``` error
+Error in UseMethod("filter"): no applicable method for 'filter' applied to an object of class "function"
+```
+
+"DEVICE_009" had the least amount of check-ins, recording only 1.
 
 :::::::::::::::::::::::::
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
-:::::::::::::::::::::::::::::::::::::::: keypoints
+## Mutating Data
 
-- Use the `dplyr` package to manipulate dataframes.
-- Use `select()` to choose variables from a dataframe.
-- Use `filter()` to choose data based on values.
-- Use `group_by()` and `summarize()` to work with subsets of data.
-- Use `mutate()` to create new variables.
+Sometimes, you may want to create new columns based on values in existing columns. 
+For example, if you have a column represented in seconds, and you might want to 
+add a new column with the same information, but represented as minutes instead. 
+
+To complete this, we use the **``mutate()`** function. This function allows us to 
+create new columns OR modify existing columns by applying operations to each row 
+of the data set!
+
+For example, let's say that we want to create a new column that, as mentioned above,
+converts the `checkin_length` column (which is in seconds) into minutes by dividing 
+each value by 60. Below, we can use the mutate function to add this column to our data:
+
+``` r
+data %>%
+    mutate(checkin_length_min = checkin_length / 60)
+```
+
+``` error
+Error in UseMethod("mutate"): no applicable method for 'mutate' applied to an object of class "function"
+```
+
+Admittedly, this operation doesn't tell us anything additional about our data, as 
+it only converts part of our data into a different format. But, with a more complex 
+operation we could, for example, add a column that says whether a check-in length 
+is "abnormal" or not! 
+
+For the sake of the example, let's say that any check-in length greater-than or equal-to 
+200 seconds is abnormal:
+
+``` r
+data %>%
+  mutate(checkin_category = ifelse(checkin_length >= 200, "abnormal", "normal"))
+```
+
+``` error
+Error in UseMethod("mutate"): no applicable method for 'mutate' applied to an object of class "function"
+```
+
+This code filters out duplicate entries, showing just one record for each unique precinct and the new column we just added.
+
+Additional examples of the **`mutate()`** function can be found at [tidy data tutor](https://tidydatatutor.com/vis.html#code=library%28dplyr%29%0Alibrary%28palmerpenguins%29%0A%0Aset.seed%282021-12-03%29%0A%0Asample_penguins%20%3C-%20penguins%20%25%3E%25%0A%20%20group_by%28species%29%20%25%3E%25%20%0A%20%20sample_n%283%29%20%25%3E%25%20%0A%20%20select%28bill_length_mm,%20bill_depth_mm%29%20%25%3E%25%20%0A%20%20ungroup%28%29%20%25%3E%25%0A%20%20select%28bill_length_mm,%20bill_depth_mm%29%0A%0Asample_penguins%20%25%3E%25%20%0A%20%20mutate%28bill_volume%20%3D%20bill_length_mm%20*%20bill_depth_mm%29&d=2025-04-18&lang=r&v=v1)
+
+:::::::::::::::::::::::::::::::::::::::  challenge
+
+## Exercise
+
+Using what you've learned throughout this lesson, create a tibble called 
+"avg_checkins" that meets the following criteria:
+1. Includes only precincts from "PRECINCT_001" to "PRECINCT_035".
+2. Removes the "PRECINCT_0" prefix from the precinct names and converts each precinct 
+   name to a numeric value.
+3. Calculates the average check-in length for each precinct, ensuring this column is 
+   named "avg_checkin_length".
+4. Contains two columns: "precinct" and "avg_checkin_length".
+5. Sorts the tibble by precinct (1 to 35).
+
+:::::::::::::::  solution
+
+## Solution
+
+
+``` r
+avg_checkins <- data %>%
+  mutate(precinct = as.numeric(str_remove(precinct, "PRECINCT_0"))) %>%
+  filter(precinct >= 1 & precinct <= 35) %>%
+  group_by(precinct) %>%
+  summarize(avg_checkin_length = mean(checkin_length)) %>%
+  arrange(precinct)
+```
+
+``` error
+Error in UseMethod("mutate"): no applicable method for 'mutate' applied to an object of class "function"
+```
+
+:::::::::::::::::::::::::
+
+Save your new "avg_checkins" into your data folder as "avg_checkins.csv"!
+
+:::::::::::::::  solution
+
+## Solution
+
+
+``` r
+write_csv(avg_checkins, "data/avg_checkins.csv")
+```
+
+``` error
+Error: object 'avg_checkins' not found
+```
+
+:::::::::::::::::::::::::
+
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
+::: keypoints
+-   Use the `dplyr` package to manipulate tibbles.
+-   Use `select()` to choose variables from a tibble.
+-   Use `filter()` to choose data based on values.
+-   Use `group_by()` and `summarize()` to work with subsets of data.
+-   Use `mutate()` to create new variables.
+:::

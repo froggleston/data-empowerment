@@ -6,16 +6,14 @@ source: Rmd
 ---
 
 
-
 ::: instructor
 
-- The main goal here is to help the learners be comfortable with the RStudio
-  interface.
+- The main goal here is to help learners be comfortable with the RStudio interface.
 - Go very slowly in the "Getting set up" section. Make sure everyone is following
   along (remind learners to use the stickies). Plan with the helpers at this
   point to go around the room, and be available to help. It's important to make
   sure that learners are in the correct working directory, and that they create
-  a `data` (all lowercase) subfolder.
+  a `data` (all lowercase) sub-folder.
 
 ::::::::::::
 
@@ -54,8 +52,8 @@ tools to make programming easier.
 
 You can also use the R Presentations feature to present your work in an HTML5
 presentation mixing Markdown and R code. You can display these within R Studio 
-or your browser. There are many options for customising your presentation slides, 
-including an option for showing LaTeX equations. This can help you collaborate
+or your browser. There are many options for customizing your presentation slides, 
+including an option for showing La-TeX equations. This can help you collaborate
 with others and also has an application in teaching and classroom use.
 
 ## Why learn R?
@@ -187,7 +185,7 @@ writing Shiny apps) that we will not cover during the workshop.
 
 One of the advantages of using RStudio is that all the information
 you need to write code is available in a single window. Additionally, RStudio
-provides many shortcuts, autocompletion, and highlighting for the major file
+provides many shortcuts, auto completion, and highlighting for the major file
 types you use while developing in R. RStudio makes typing easier and less
 error-prone.
 
@@ -255,14 +253,14 @@ can be especially helpful when you have multiple projects. In general, you might
 create directories (folders) for **scripts**, **data**, and **documents**. Here
 are some examples of suggested directories:
 
-- **`data/`** Use this folder to store your raw data and intermediate datasets.
+- **`data/`** Use this folder to store your raw data and intermediate data sets.
   For the sake of transparency and
   [provenance](https://en.wikipedia.org/wiki/Provenance), you
   should *always* keep a copy of your raw data accessible and do as much of
-  your data cleanup and preprocessing programmatically (i.e., with scripts,
+  your data cleanup and pre-processing programmatically (i.e., with scripts,
   rather than manually) as possible.
 - **`data_output/`** When you need to modify your raw data,
-  it might be useful to store the modified versions of the datasets in a
+  it might be useful to store the modified versions of the data sets in a
   different folder.
 - **`documents/`** Used for outlines, drafts, and other
   text.
@@ -271,7 +269,7 @@ are some examples of suggested directories:
 - **`scripts/`** A place to keep your R scripts for
   different analyses or plotting.
 
-You may want additional directories or subdirectories depending on your project
+You may want additional directories or sub directories depending on your project
 needs, but these should form the backbone of your working directory.
 
 ![](fig/rstudio_project_files.jpeg){alt='Example of a working directory structure'}
@@ -296,7 +294,7 @@ and with other users.
 ### Downloading the data and getting set up
 
 For this lesson we will use the following folders in our working directory:
-**`data/`**, **`data_output/`** and **`fig_output/`**. Let's write them all in
+**`data/`** and **`fig_output/`**. Let's write them all in
 lowercase to be consistent. We can create them using the RStudio interface by
 clicking on the "New Folder" button in the file pane (bottom right), or directly
 from R by typing at console:
@@ -304,21 +302,84 @@ from R by typing at console:
 
 ``` r
 dir.create("data")
-dir.create("data_output")
 dir.create("fig_output")
 ```
 
 You can either download the data used for this lesson from GitHub or with R.
-You can copy the data from this [GitHub link](https://github.com/datacarpentry/r-socialsci/blob/main/episodes/data/SAFI_clean.csv)
-and paste it into a file called `SAFI_clean.csv` in the `data/` directory you just created.
-Or you can do this directly from R by copying and pasting this in your terminal
-(your instructor can place this chunk of code in the Etherpad):
 
+#### Check-In Dataset:
+
+You can either copy the data from [GitHub ](https://raw.githubusercontent.com/EngineeringForDemocracy/data-empowerment/main/episodes/data/checkin_data.csv)
+and paste it into a file called `checkin_data.csv` in the `data/` directory or
+copy-paste the below code chunk into your terminal:
 
 ``` r
 download.file(
-  "https://raw.githubusercontent.com/datacarpentry/r-socialsci/main/episodes/data/SAFI_clean.csv",
-  "data/SAFI_clean.csv", mode = "wb"
+  "https://raw.githubusercontent.com/EngineeringForDemocracy/data-empowerment/main/episodes/data/checkin_data.csv",
+  "data/checkin_data.csv", mode = "wb"
+  )
+```
+
+#### Check-In Plotting Dataset:
+
+You can either copy the data from this [GitHub ](https://raw.githubusercontent.com/EngineeringForDemocracy/data-empowerment/main/episodes/data/checkin_sample_plotting.csv)
+and paste it into a file called `checkin_sample_plotting.csv` in the `data/` directory or
+copy-paste the below code chunk into your terminal:
+
+``` r
+download.file(
+  "https://raw.githubusercontent.com/EngineeringForDemocracy/data-empowerment/main/episodes/data/checkin_sample_plotting.csv",
+  "data/checkin_sample_plotting.csv", mode = "wb"
+  )
+```
+
+#### Messy Dataset:
+
+You can either copy the data from this [GitHub link](https://raw.githubusercontent.com/EngineeringForDemocracy/data-empowerment/main/episodes/data/messy_data.csv)
+and paste it into a file called `messy_data.csv` in the `data/` directory or
+copy-paste the below code chunk into your terminal:
+
+``` r
+download.file(
+  "https://raw.githubusercontent.com/EngineeringForDemocracy/data-empowerment/main/episodes/data/messy_data.csv",
+  "messy_data.csv", mode = "wb"
+  )
+```
+
+#### Game of Thrones Dataset:
+
+You can either copy the data from this [GitHub link](https://raw.githubusercontent.com/EngineeringForDemocracy/data-empowerment/main/episodes/data/voting_GoT.csv)
+and paste it into a file called `voting_GoT.csv` in the `data/` directory or
+copy-paste the below code chunk into your terminal:
+
+``` r
+download.file(
+  "https://raw.githubusercontent.com/EngineeringForDemocracy/data-empowerment/main/episodes/data/voting_GoT.csv",
+  "data/voting_GoT.csv", mode = "wb"
+  )
+```
+
+You can either copy the data from this [GitHub link](https://raw.githubusercontent.com/EngineeringForDemocracy/data-empowerment/main/episodes/data/polygons_GoT.geojson)
+and paste it into a file called `polygons_GoT.geojson` in the `data/` directory or
+copy-paste the below code chunk into your terminal:
+
+``` r
+download.file(
+  "https://raw.githubusercontent.com/EngineeringForDemocracy/data-empowerment/main/episodes/data/polygons_GoT.geojson",
+  "polygons_GoT.geojson", mode = "wb"
+  )
+```
+
+#### JSON Check-In Dataset:
+
+You can either copy the data from this [GitHub link](https://raw.githubusercontent.com/EngineeringForDemocracy/data-empowerment/main/episodes/data/checkin_snippet.json)
+and paste it into a file called `checkin_snippet.json` in the `data/` directory or
+copy-paste the below code chunk into your terminal:
+
+``` r
+download.file(
+  "https://raw.githubusercontent.com/EngineeringForDemocracy/data-empowerment/main/episodes/data/checkin_snippet.json",
+  "data/checkin_snippet.json", mode = "wb"
   )
 ```
 
@@ -455,11 +516,13 @@ was written to the console before the start of the installation messages.
 
 You could also have installed the **`tidyverse`** packages by running this command directly at the R terminal.
 
-We will be using another package called **`here`** throughout the workshop to manage paths and directories. We will discuss it more detail in a later episode, but we will install it now in the console:
+We will be using additional packages to manage paths, plots, json files, and shape 
+files. We will discuss these in more detail in a later episode, but we will install 
+them now in the console:
 
 
 ``` r
-install.packages("here")
+install.packages("here", "lattice", "sf", "jsonlite")
 ```
 
 :::::::::::::::::::::::::::::::::::::::: keypoints

@@ -9,10 +9,10 @@ source: Rmd
 
 The main goals for this lessons are:
 
-- Ensure learners are comfortable with working with data frames, and
+- Ensure learners are comfortable with working with data frames and tibbles, and
   can use the bracket notation to select slices/columns.
-- Make sure learners can import data into R and convert data into data frames
-  for analysis purposes.
+- Make sure learners can import data into R and convert data into tibbles for 
+  analysis purposes.
 - Expose learners to factors. Their behavior is not necessarily intuitive, so it 
   is important that they are guided through it the first time they are
   exposed to it. The content of the lesson should be enough for learners to
@@ -27,14 +27,15 @@ The main goals for this lessons are:
 
 - Understand what an R package is.
 - Describe what a data frame is.
-- Load external data from a .csv file into a data frame.
-- Summarize the contents of a data frame.
-- Subset values from data frames.
+- Describe what a tibble is.
+- Load external data from a .csv file into a tibble.
+- Summarize the contents of a tibble.
+- Subset values from a tibble.
 - Describe the difference between a factor and a string.
 - Convert between strings and factors.
 - Reorder and rename factors.
-- Change how character strings are handled in a data frame.
-- Examine and change date formats.
+- Change how character strings are handled in a tibble.
+- Examine and change date formats within a data set.
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -42,20 +43,21 @@ The main goals for this lessons are:
 
 - What is an R package?
 - What is a data.frame?
+- What is a tibble, and how is it different from a data frame?
 - How can I read a complete csv file into R?
-- How can I get basic summary information about my dataset?
-- How can I change the way R treats strings in my dataset?
+- How can I get basic summary information about my data set?
+- How can I change the way R treats strings in my data set?
 - Why would I want strings to be treated differently?
-- How are dates represented in datasets and how can I change the format?
+- How are dates represented in data sets and how can I change the format?
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 ## What is an R package?
 
-An R package is a collection of functions and (occasionally) datasets that
+An R package is a collection of functions and (occasionally) data sets that
 extend the functionality of R. Throughout these lessons, we will primarily be 
 using the **`tidyverse`**, which is a collection of R packages designed to make 
-datascience easier!
+data science easier!
 
 When installing and loading **`tidyverse`**, the following are all of the 
 packages that are installed/loaded as part of the collection:
@@ -116,23 +118,24 @@ functions `read_csv()` or `read_table()`; in other words, when importing
 spreadsheets from your hard drive (or the web). We will now demonstrate how to
 import tabular data using `read_csv()`.
 
-## Introduction to the Anonymized Dataset
+## Introduction to the Check-In Dataset
 
-The Anonymized Dataset is an example dataset that is based on the 2018 election. 
-Each row in the dataset represents one ballot case, and includes an ID, arrival
-time, location, precinct, and machine.
+The Check-In Dataset is an example data set that is based on the 2018 election. 
+Each row in the data set represents one ballot case, and includes an ID, check-in 
+length, arrival time, location, precinct, and machine.
 
-The following is a visual representation of the dataset's columns:
+The following is a visual representation of the data set's columns:
 
 | column\_name         | description                                                                                                                      | 
 | -------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
 | checkin\_id          | Provides a unique key/ID for each ballot instance.                                                                               | 
+| checkin\_length      | How long it took the person submitting the ballot to check-in to the polling location.                                           | 
 | checkin\_time        | The arrival time of the person submitting the ballot, includes both the date and time.                                           | 
 | location             | Anonymized ID for the location of the ballot box.                                                                                | 
 | precinct             | Anonymized ID for the precinct that the ballot box belongs to.                                                                   | 
 | device               | Anonymized ID for each ballot box.                                                                                               | 
 
-## Importing data
+## Importing Data
 
 You are going to load the data in R's memory using the function `read_csv()`.
 This is from the **`readr`** package, which (as you may remember) is part of 
@@ -182,15 +185,23 @@ tidyverse and here packages.
 #loads in the tidyverse and here packages
 library(tidyverse)
 library(here)
+```
 
+``` error
+Error in library(here): there is no package called 'here'
+```
+
+``` r
 #reads in data and assigns it to the 'data' variable using 'here'
-data <- read_csv(
-        here("data", "anonymized_data.csv")
-        )
+data <- read_csv(here("data", "checkin_data.csv"))
+```
+
+``` error
+Error in here("data", "checkin_data.csv"): could not find function "here"
 ```
 
 In the above code, we notice the `here()` function takes folder and file names
-as inputs (e.g., `"data"`, `"anonymized_data.csv"`), each enclosed in quotations
+as inputs (e.g., `"data"`, `"checkin_data.csv"`), each enclosed in quotations
 (`""`) and separated by a comma. The `here()` will accept as many names as are
 necessary to navigate to a particular file.
 
@@ -201,8 +212,8 @@ use `here("info", "data.csv")`.
 
 The `here()` function can accept the folder and file names in an alternate format,
 using a slash ("/") rather than commas to separate the names. The two methods are
-equivalent, so that `here("data", "anonymized_data.csv")` and
-`here("data/anonymized_data.csv")` produce the same result. (The forward slash 
+equivalent, so that `here("data", "checkin_data.csv")` and
+`here("data/checkin_data.csv")` produce the same result. (The forward slash 
 is used on all operating systems; backslashes are never used.)
 
 If you were to type in the code above, it is likely that the `read.csv()`
@@ -211,19 +222,22 @@ function is different from the `read_csv()` function, as it is included in the
 "base" packages that come pre-installed with R. Overall, `read.csv()` behaves
 similar to `read_csv()`, with a few notable differences. First, `read.csv()`
 coerces column names with spaces and/or special characters to different names
-(e.g. `interview date` becomes `interview.date`). Second, `read.csv()`
-stores data as a `data.frame`, where `read_csv()` stores data as a different 
-kind of data frame called a `tibble`. We prefer tibbles because they have nice 
-printing properties among other desirable qualities. Read more about tibbles
-[here](https://tibble.tidyverse.org/).
+(e.g. `interview date` becomes `interview.date`). 
 
-The second statement in the code above creates a data frame but doesn't output
-any data because, as you might recall, assignments (`<-`) don't display
-anything. (Note, however, that `read_csv` may show informational text about the 
-data frame that is created.) If we want to check that our data has been loaded, 
-we can see the contents of the data frame by typing its name: `interviews` in 
-the console.
+Second, `read.csv()` stores data as a `data.frame`, where `read_csv()` stores data 
+as a different kind of data frame called a `tibble`. A tibble is an extension of 
+`R` data frames used by the **`tidyverse`**. We prefer tibbles because they have 
+nice printing properties among other desirable qualities. You can read more about 
+[tibbles in its docs](https://tibble.tidyverse.org/).
 
+
+Additionally, the `read_csv()` statement in the code above creates a tibble but 
+doesn't output any data because, as you might recall, assignments (`<-`) don't 
+display anything. Note, however, that `read_csv` may show informational text about the 
+data frame that is created. 
+
+If we want to check that our tibble has been loaded, we can see the contents of the 
+data by typing its name: `data` in the console:
 
 ``` r
 data
@@ -233,20 +247,158 @@ data
 ```
 
 ``` output
-# A tibble: 352,112 × 5
-   checkin_id     checkin_time        location     precinct device    
-   <chr>          <dttm>              <chr>           <dbl> <chr>     
- 1 CHECKIN_000001 2018-11-06 07:02:36 LOCATION_001     2866 DEVICE_001
- 2 CHECKIN_000002 2018-11-06 07:04:09 LOCATION_001     2866 DEVICE_001
- 3 CHECKIN_000003 2018-11-06 07:05:13 LOCATION_001     2866 DEVICE_001
- 4 CHECKIN_000004 2018-11-06 07:06:26 LOCATION_001     2866 DEVICE_001
- 5 CHECKIN_000005 2018-11-06 07:08:08 LOCATION_001     2866 DEVICE_001
- 6 CHECKIN_000006 2018-11-06 07:08:32 LOCATION_001     2866 DEVICE_002
- 7 CHECKIN_000007 2018-11-06 07:09:36 LOCATION_001     2866 DEVICE_001
- 8 CHECKIN_000008 2018-11-06 07:10:18 LOCATION_001     2866 DEVICE_001
- 9 CHECKIN_000009 2018-11-06 07:12:57 LOCATION_001     2866 DEVICE_002
-10 CHECKIN_000010 2018-11-06 07:13:41 LOCATION_001     2866 DEVICE_001
-# ℹ 352,102 more rows
+function (..., list = character(), package = NULL, lib.loc = NULL, 
+    verbose = getOption("verbose"), envir = .GlobalEnv, overwrite = TRUE) 
+{
+    fileExt <- function(x) {
+        db <- grepl("\\.[^.]+\\.(gz|bz2|xz)$", x)
+        ans <- sub(".*\\.", "", x)
+        ans[db] <- sub(".*\\.([^.]+\\.)(gz|bz2|xz)$", "\\1\\2", 
+            x[db])
+        ans
+    }
+    my_read_table <- function(...) {
+        lcc <- Sys.getlocale("LC_COLLATE")
+        on.exit(Sys.setlocale("LC_COLLATE", lcc))
+        Sys.setlocale("LC_COLLATE", "C")
+        read.table(...)
+    }
+    stopifnot(is.character(list))
+    names <- c(as.character(substitute(list(...))[-1L]), list)
+    if (!is.null(package)) {
+        if (!is.character(package)) 
+            stop("'package' must be a character vector or NULL")
+    }
+    paths <- find.package(package, lib.loc, verbose = verbose)
+    if (is.null(lib.loc)) 
+        paths <- c(path.package(package, TRUE), if (!length(package)) getwd(), 
+            paths)
+    paths <- unique(normalizePath(paths[file.exists(paths)]))
+    paths <- paths[dir.exists(file.path(paths, "data"))]
+    dataExts <- tools:::.make_file_exts("data")
+    if (length(names) == 0L) {
+        db <- matrix(character(), nrow = 0L, ncol = 4L)
+        for (path in paths) {
+            entries <- NULL
+            packageName <- if (file_test("-f", file.path(path, 
+                "DESCRIPTION"))) 
+                basename(path)
+            else "."
+            if (file_test("-f", INDEX <- file.path(path, "Meta", 
+                "data.rds"))) {
+                entries <- readRDS(INDEX)
+            }
+            else {
+                dataDir <- file.path(path, "data")
+                entries <- tools::list_files_with_type(dataDir, 
+                  "data")
+                if (length(entries)) {
+                  entries <- unique(tools::file_path_sans_ext(basename(entries)))
+                  entries <- cbind(entries, "")
+                }
+            }
+            if (NROW(entries)) {
+                if (is.matrix(entries) && ncol(entries) == 2L) 
+                  db <- rbind(db, cbind(packageName, dirname(path), 
+                    entries))
+                else warning(gettextf("data index for package %s is invalid and will be ignored", 
+                  sQuote(packageName)), domain = NA, call. = FALSE)
+            }
+        }
+        colnames(db) <- c("Package", "LibPath", "Item", "Title")
+        footer <- if (missing(package)) 
+            paste0("Use ", sQuote(paste("data(package =", ".packages(all.available = TRUE))")), 
+                "\n", "to list the data sets in all *available* packages.")
+        else NULL
+        y <- list(title = "Data sets", header = NULL, results = db, 
+            footer = footer)
+        class(y) <- "packageIQR"
+        return(y)
+    }
+    paths <- file.path(paths, "data")
+    for (name in names) {
+        found <- FALSE
+        for (p in paths) {
+            tmp_env <- if (overwrite) 
+                envir
+            else new.env()
+            if (file_test("-f", file.path(p, "Rdata.rds"))) {
+                rds <- readRDS(file.path(p, "Rdata.rds"))
+                if (name %in% names(rds)) {
+                  found <- TRUE
+                  if (verbose) 
+                    message(sprintf("name=%s:\t found in Rdata.rds", 
+                      name), domain = NA)
+                  objs <- rds[[name]]
+                  lazyLoad(file.path(p, "Rdata"), envir = tmp_env, 
+                    filter = function(x) x %in% objs)
+                  break
+                }
+                else if (verbose) 
+                  message(sprintf("name=%s:\t NOT found in names() of Rdata.rds, i.e.,\n\t%s\n", 
+                    name, paste(names(rds), collapse = ",")), 
+                    domain = NA)
+            }
+            files <- list.files(p, full.names = TRUE)
+            files <- files[grep(name, files, fixed = TRUE)]
+            if (length(files) > 1L) {
+                o <- match(fileExt(files), dataExts, nomatch = 100L)
+                paths0 <- dirname(files)
+                paths0 <- factor(paths0, levels = unique(paths0))
+                files <- files[order(paths0, o)]
+            }
+            if (length(files)) {
+                for (file in files) {
+                  if (verbose) 
+                    message("name=", name, ":\t file= ...", .Platform$file.sep, 
+                      basename(file), "::\t", appendLF = FALSE, 
+                      domain = NA)
+                  ext <- fileExt(file)
+                  if (basename(file) != paste0(name, ".", ext)) 
+                    found <- FALSE
+                  else {
+                    found <- TRUE
+                    switch(ext, R = , r = {
+                      library("utils")
+                      sys.source(file, chdir = TRUE, envir = tmp_env)
+                    }, RData = , rdata = , rda = load(file, envir = tmp_env), 
+                      TXT = , txt = , tab = , tab.gz = , tab.bz2 = , 
+                      tab.xz = , txt.gz = , txt.bz2 = , txt.xz = assign(name, 
+                        my_read_table(file, header = TRUE, as.is = FALSE), 
+                        envir = tmp_env), CSV = , csv = , csv.gz = , 
+                      csv.bz2 = , csv.xz = assign(name, my_read_table(file, 
+                        header = TRUE, sep = ";", as.is = FALSE), 
+                        envir = tmp_env), found <- FALSE)
+                  }
+                  if (found) 
+                    break
+                }
+                if (verbose) 
+                  message(if (!found) 
+                    "*NOT* ", "found", domain = NA)
+            }
+            if (found) 
+                break
+        }
+        if (!found) {
+            warning(gettextf("data set %s not found", sQuote(name)), 
+                domain = NA)
+        }
+        else if (!overwrite) {
+            for (o in ls(envir = tmp_env, all.names = TRUE)) {
+                if (exists(o, envir = envir, inherits = FALSE)) 
+                  warning(gettextf("an object named %s already exists and will not be overwritten", 
+                    sQuote(o)))
+                else assign(o, get(o, envir = tmp_env, inherits = FALSE), 
+                  envir = envir)
+            }
+            rm(tmp_env)
+        }
+    }
+    invisible(names)
+}
+<bytecode: 0x558ce91dc068>
+<environment: namespace:utils>
 ```
 
 :::::::::::::::::::::::::::::::::::::::::  callout
@@ -266,18 +418,15 @@ of your file.
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
-Note that `read_csv()` actually loads the data as a tibble.
-A tibble is an extension of `R` data frames used by the **`tidyverse`**. When
-the data is read using `read_csv()`, it is stored in an object of class
-`tbl_df`, `tbl`,  and `data.frame`. You can see the class of an object with
-
+When the data is read using `read_csv()`, it is stored in an object of class
+`tbl_df`, `tbl`,  and `data.frame`. You can see the class of an object using:
 
 ``` r
 class(data)
 ```
 
 ``` output
-[1] "spec_tbl_df" "tbl_df"      "tbl"         "data.frame" 
+[1] "function"
 ```
 
 As a `tibble`, the type of data included in each column is listed in an
@@ -286,13 +435,13 @@ column of characters (`<chr>`),`precinct` is a column of floating point numbers
 (abbreviated `<dbl>` for the word 'double'), and the `checkin_time` is a column 
 in the "date and time" format (`<dttm>` or `<S3: POSIXct>`).
 
-## Inspecting data frames
+## Inspecting Tibbles
 
 When calling a `tbl_df` object (like `data` here), there is already a lot
-of information about our data frame being displayed such as the number of rows,
-the number of columns, the names of the columns, and as we just saw the class of
+of information about our tibble being displayed, such as the number of rows,
+the number of columns, the names of the columns, and, as we just saw, the class of
 data stored in each column. However, there are functions to extract this
-information from data frames.  Here is a non-exhaustive list of some of these
+information from tibbles.  Here is a non-exhaustive list of some of these
 functions. Let's try them out!
 
 Size:
@@ -327,10 +476,10 @@ Summary:
 Note: most of these functions are "generic." They can be used on other types of
 objects besides data frames or tibbles.
 
-## Subsetting data frames
+## Subsetting Tibbles
 
-Our `data` data frame has rows and columns (it has 2 dimensions).
-In practice, we may not need the entire data frame; for instance, we may only
+Our `data` tibble has rows and columns (it has 2 dimensions).
+In practice, we may not need the entire tibble; for instance, we may only
 be interested in a subset of the observations (the rows) or a particular set
 of variables (the columns). If we want to access some specific data from it, we 
 need to specify the "coordinates" (i.e., indices) we want from it. Row numbers 
@@ -354,11 +503,8 @@ different classes. This is covered in the Software Carpentry lesson
 data[1, 1]
 ```
 
-``` output
-# A tibble: 1 × 1
-  checkin_id    
-  <chr>         
-1 CHECKIN_000001
+``` error
+Error in data[1, 1]: object of type 'closure' is not subsettable
 ```
 
 ``` r
@@ -366,11 +512,8 @@ data[1, 1]
 data[1, 5]
 ```
 
-``` output
-# A tibble: 1 × 1
-  device    
-  <chr>     
-1 DEVICE_001
+``` error
+Error in data[1, 5]: object of type 'closure' is not subsettable
 ```
 
 ``` r
@@ -378,21 +521,8 @@ data[1, 5]
 data[1]
 ```
 
-``` output
-# A tibble: 352,112 × 1
-   checkin_id    
-   <chr>         
- 1 CHECKIN_000001
- 2 CHECKIN_000002
- 3 CHECKIN_000003
- 4 CHECKIN_000004
- 5 CHECKIN_000005
- 6 CHECKIN_000006
- 7 CHECKIN_000007
- 8 CHECKIN_000008
- 9 CHECKIN_000009
-10 CHECKIN_000010
-# ℹ 352,102 more rows
+``` error
+Error in data[1]: object of type 'closure' is not subsettable
 ```
 
 ``` r
@@ -401,9 +531,8 @@ data[1]
 head(data[[1]])
 ```
 
-``` output
-[1] "CHECKIN_000001" "CHECKIN_000002" "CHECKIN_000003" "CHECKIN_000004"
-[5] "CHECKIN_000005" "CHECKIN_000006"
+``` error
+Error in data[[1]]: object of type 'closure' is not subsettable
 ```
 
 ``` r
@@ -411,13 +540,8 @@ head(data[[1]])
 data[1:3, 3]
 ```
 
-``` output
-# A tibble: 3 × 1
-  location    
-  <chr>       
-1 LOCATION_001
-2 LOCATION_001
-3 LOCATION_001
+``` error
+Error in data[1:3, 3]: object of type 'closure' is not subsettable
 ```
 
 ``` r
@@ -425,11 +549,8 @@ data[1:3, 3]
 data[3, ]
 ```
 
-``` output
-# A tibble: 1 × 5
-  checkin_id     checkin_time        location     precinct device    
-  <chr>          <dttm>              <chr>           <dbl> <chr>     
-1 CHECKIN_000003 2018-11-06 07:05:13 LOCATION_001     2866 DEVICE_001
+``` error
+Error in data[3, ]: object of type 'closure' is not subsettable
 ```
 
 ``` r
@@ -437,10 +558,14 @@ data[3, ]
 head_data <- data[1:6, ]
 ```
 
+``` error
+Error in data[1:6, ]: object of type 'closure' is not subsettable
+```
+
 `:` is a special function that creates numeric vectors of integers in increasing
 or decreasing order, test `1:10` and `10:1` for instance.
 
-You can also exclude certain indices of a data frame using the "`-`" sign:
+You can also exclude certain indices of a tibble using the "`-`" sign:
 
 
 ``` r
@@ -448,21 +573,8 @@ You can also exclude certain indices of a data frame using the "`-`" sign:
 data[, -1]
 ```
 
-``` output
-# A tibble: 352,112 × 4
-   checkin_time        location     precinct device    
-   <dttm>              <chr>           <dbl> <chr>     
- 1 2018-11-06 07:02:36 LOCATION_001     2866 DEVICE_001
- 2 2018-11-06 07:04:09 LOCATION_001     2866 DEVICE_001
- 3 2018-11-06 07:05:13 LOCATION_001     2866 DEVICE_001
- 4 2018-11-06 07:06:26 LOCATION_001     2866 DEVICE_001
- 5 2018-11-06 07:08:08 LOCATION_001     2866 DEVICE_001
- 6 2018-11-06 07:08:32 LOCATION_001     2866 DEVICE_002
- 7 2018-11-06 07:09:36 LOCATION_001     2866 DEVICE_001
- 8 2018-11-06 07:10:18 LOCATION_001     2866 DEVICE_001
- 9 2018-11-06 07:12:57 LOCATION_001     2866 DEVICE_002
-10 2018-11-06 07:13:41 LOCATION_001     2866 DEVICE_001
-# ℹ 352,102 more rows
+``` error
+Error in data[, -1]: object of type 'closure' is not subsettable
 ```
 
 ``` r
@@ -470,16 +582,8 @@ data[, -1]
 data[-c(7:352112), ]
 ```
 
-``` output
-# A tibble: 6 × 5
-  checkin_id     checkin_time        location     precinct device    
-  <chr>          <dttm>              <chr>           <dbl> <chr>     
-1 CHECKIN_000001 2018-11-06 07:02:36 LOCATION_001     2866 DEVICE_001
-2 CHECKIN_000002 2018-11-06 07:04:09 LOCATION_001     2866 DEVICE_001
-3 CHECKIN_000003 2018-11-06 07:05:13 LOCATION_001     2866 DEVICE_001
-4 CHECKIN_000004 2018-11-06 07:06:26 LOCATION_001     2866 DEVICE_001
-5 CHECKIN_000005 2018-11-06 07:08:08 LOCATION_001     2866 DEVICE_001
-6 CHECKIN_000006 2018-11-06 07:08:32 LOCATION_001     2866 DEVICE_002
+``` error
+Error in data[-c(7:352112), ]: object of type 'closure' is not subsettable
 ```
 
 `tibble`s can be subset by calling indices (as shown previously), but also by
@@ -500,7 +604,7 @@ data[["location"]]
 data$location
 ```
 
-In RStudio, you can use the **`autocompletion feature`** to get the full and 
+In RStudio, you can use the **`auto-completion feature`** to get the full and 
 correct names of the columns.
 
 :::::::::::::::::::::::::::::::::::::::  challenge
@@ -508,7 +612,7 @@ correct names of the columns.
 ## Exercise
 
 1. Create a tibble (`data_100`) containing only the data in
-   row 100 of the `data` dataset.
+   row 100 of the `data` data set.
 
 Now, continue using `data` for each of the following activities: 
 
@@ -520,14 +624,14 @@ Now, continue using `data` for each of the following activities:
 - Pull out that last row using `nrow()` instead of the row number.
 - Create a new tibble (`data_last`) from that last row.
 
-3. Using the number of rows in the Anonymized Dataset that you found in
-   question 2, extract the rows that are in the middle of the dataset. Store
+3. Using the number of rows in the Check-In Dataset that you found in
+   question 2, extract the rows that are in the middle of the data set. Store
    the content of these middle rows in an object named `data_middle`.
    (hint: the middle two items of a set of 4 would be 2 + 3, or visually, 
    [][X][X][])
 
 4. Combine `nrow()` with the `-` notation above to reproduce the behavior of
-   `head(data)`, keeping just the first through 6th rows of the Anonymized
+   `head(data)`, keeping just the first through 6th rows of the Check-In
    Dataset.
  
 :::::::::::::::  solution
@@ -538,17 +642,39 @@ Now, continue using `data` for each of the following activities:
 ``` r
 #part 1:
 data_100 <- data[100, ]
+```
 
+``` error
+Error in data[100, ]: object of type 'closure' is not subsettable
+```
+
+``` r
 #part 2:
 #we save nrows so we can use it multiple times! makes the code cleaner :)
 n_rows <- nrow(data)
 data_last <- data[n_rows, ]
+```
 
+``` error
+Error in data[n_rows, ]: object of type 'closure' is not subsettable
+```
+
+``` r
 #part 3:
 data_middle <- data[(n_rows/2):((n_rows/2) + 1), ]
+```
 
+``` error
+Error in (n_rows/2):((n_rows/2) + 1): argument of length 0
+```
+
+``` r
 #part 4:
 data_head <- data[-(7:n_rows), ]
+```
+
+``` error
+Error in 7:n_rows: argument of length 0
 ```
 
 :::::::::::::::::::::::::
@@ -693,7 +819,7 @@ ballot_type_ordered #now ordered
 Levels: provisional < absentee
 ```
 
-### Converting factors
+### Converting Factors
 
 If you need to convert a factor to a character vector, you use
 `as.character(x)`.
@@ -748,7 +874,7 @@ Notice that in the recommended `levels()` approach, three important steps occur:
 - We then access these numeric values using the underlying integers of the
   vector `year_fct` inside the square brackets
 
-### Renaming factors
+### Renaming Factors
 
 When your data is stored as a factor, you can use the `plot()` function to get a
 quick glance at the number of observations represented by each factor level.
@@ -852,8 +978,8 @@ plot(ballotData)
 
 Recall our coverage of dates in "Intro to R".  A best practice for dealing with 
 date data is to ensure that each component of your date is available as a 
-separate variable. In our dataset, we have a column `checkin_time` which 
-contains information about theyear, month, day, hour, minute, and second that 
+separate variable. In our data set, we have a column `checkin_time` which 
+contains information about the year, month, day, hour, minute, and second that 
 the person that submitted the ballot arrived in the building. Let's convert 
 those dates into six separate columns.
 
@@ -862,7 +988,7 @@ those dates into six separate columns.
 str(data)
 ```
 
-We are going to use the package **`lubridate`**, , which is included in the 
+We are going to use the package **`lubridate`**, which is included in the 
 **`tidyverse`** installation and should be loaded by default. However, if we 
 deal with older versions of tidyverse (2022 and earlier), we can manually load it 
 by typing `library(lubridate)`.
@@ -882,49 +1008,234 @@ Let's extract our `checkin_time` column and inspect the structure:
 
 ``` r
 times <- data$checkin_time
+```
+
+``` error
+Error in data$checkin_time: object of type 'closure' is not subsettable
+```
+
+``` r
 str(times)
 ```
 
-``` output
- POSIXct[1:352112], format: "2018-11-06 07:02:36" "2018-11-06 07:04:09" "2018-11-06 07:05:13" ...
+``` error
+Error: object 'times' not found
 ```
 
 When we imported the data in R, `read_csv()` recognized that this column
 contained date information. We can now use the `day()`, `month()`,  `year()`,
 `hour()`, `minute()`,  and `second()` functions to extract this information from 
-the date, and create new columns in our data frame to store it:
+the date, and create new columns in our tibble to store it:
 
 
 ``` r
 data$day <- day(times)
-data$month <- month(times)
-data$year <- year(times)
-data$hour <- hour(times)
-data$minute <- minute(times)
-data$seconds <- second(times)
+```
 
+``` error
+Error: object 'times' not found
+```
+
+``` r
+data$month <- month(times)
+```
+
+``` error
+Error: object 'times' not found
+```
+
+``` r
+data$year <- year(times)
+```
+
+``` error
+Error: object 'times' not found
+```
+
+``` r
+data$hour <- hour(times)
+```
+
+``` error
+Error: object 'times' not found
+```
+
+``` r
+data$minute <- minute(times)
+```
+
+``` error
+Error: object 'times' not found
+```
+
+``` r
+data$seconds <- second(times)
+```
+
+``` error
+Error: object 'times' not found
+```
+
+``` r
 data
 ```
 
 ``` output
-# A tibble: 352,112 × 11
-   checkin_id     checkin_time        location precinct device   day month  year
-   <chr>          <dttm>              <chr>       <dbl> <chr>  <int> <dbl> <dbl>
- 1 CHECKIN_000001 2018-11-06 07:02:36 LOCATIO…     2866 DEVIC…     6    11  2018
- 2 CHECKIN_000002 2018-11-06 07:04:09 LOCATIO…     2866 DEVIC…     6    11  2018
- 3 CHECKIN_000003 2018-11-06 07:05:13 LOCATIO…     2866 DEVIC…     6    11  2018
- 4 CHECKIN_000004 2018-11-06 07:06:26 LOCATIO…     2866 DEVIC…     6    11  2018
- 5 CHECKIN_000005 2018-11-06 07:08:08 LOCATIO…     2866 DEVIC…     6    11  2018
- 6 CHECKIN_000006 2018-11-06 07:08:32 LOCATIO…     2866 DEVIC…     6    11  2018
- 7 CHECKIN_000007 2018-11-06 07:09:36 LOCATIO…     2866 DEVIC…     6    11  2018
- 8 CHECKIN_000008 2018-11-06 07:10:18 LOCATIO…     2866 DEVIC…     6    11  2018
- 9 CHECKIN_000009 2018-11-06 07:12:57 LOCATIO…     2866 DEVIC…     6    11  2018
-10 CHECKIN_000010 2018-11-06 07:13:41 LOCATIO…     2866 DEVIC…     6    11  2018
-# ℹ 352,102 more rows
-# ℹ 3 more variables: hour <int>, minute <int>, seconds <dbl>
+function (..., list = character(), package = NULL, lib.loc = NULL, 
+    verbose = getOption("verbose"), envir = .GlobalEnv, overwrite = TRUE) 
+{
+    fileExt <- function(x) {
+        db <- grepl("\\.[^.]+\\.(gz|bz2|xz)$", x)
+        ans <- sub(".*\\.", "", x)
+        ans[db] <- sub(".*\\.([^.]+\\.)(gz|bz2|xz)$", "\\1\\2", 
+            x[db])
+        ans
+    }
+    my_read_table <- function(...) {
+        lcc <- Sys.getlocale("LC_COLLATE")
+        on.exit(Sys.setlocale("LC_COLLATE", lcc))
+        Sys.setlocale("LC_COLLATE", "C")
+        read.table(...)
+    }
+    stopifnot(is.character(list))
+    names <- c(as.character(substitute(list(...))[-1L]), list)
+    if (!is.null(package)) {
+        if (!is.character(package)) 
+            stop("'package' must be a character vector or NULL")
+    }
+    paths <- find.package(package, lib.loc, verbose = verbose)
+    if (is.null(lib.loc)) 
+        paths <- c(path.package(package, TRUE), if (!length(package)) getwd(), 
+            paths)
+    paths <- unique(normalizePath(paths[file.exists(paths)]))
+    paths <- paths[dir.exists(file.path(paths, "data"))]
+    dataExts <- tools:::.make_file_exts("data")
+    if (length(names) == 0L) {
+        db <- matrix(character(), nrow = 0L, ncol = 4L)
+        for (path in paths) {
+            entries <- NULL
+            packageName <- if (file_test("-f", file.path(path, 
+                "DESCRIPTION"))) 
+                basename(path)
+            else "."
+            if (file_test("-f", INDEX <- file.path(path, "Meta", 
+                "data.rds"))) {
+                entries <- readRDS(INDEX)
+            }
+            else {
+                dataDir <- file.path(path, "data")
+                entries <- tools::list_files_with_type(dataDir, 
+                  "data")
+                if (length(entries)) {
+                  entries <- unique(tools::file_path_sans_ext(basename(entries)))
+                  entries <- cbind(entries, "")
+                }
+            }
+            if (NROW(entries)) {
+                if (is.matrix(entries) && ncol(entries) == 2L) 
+                  db <- rbind(db, cbind(packageName, dirname(path), 
+                    entries))
+                else warning(gettextf("data index for package %s is invalid and will be ignored", 
+                  sQuote(packageName)), domain = NA, call. = FALSE)
+            }
+        }
+        colnames(db) <- c("Package", "LibPath", "Item", "Title")
+        footer <- if (missing(package)) 
+            paste0("Use ", sQuote(paste("data(package =", ".packages(all.available = TRUE))")), 
+                "\n", "to list the data sets in all *available* packages.")
+        else NULL
+        y <- list(title = "Data sets", header = NULL, results = db, 
+            footer = footer)
+        class(y) <- "packageIQR"
+        return(y)
+    }
+    paths <- file.path(paths, "data")
+    for (name in names) {
+        found <- FALSE
+        for (p in paths) {
+            tmp_env <- if (overwrite) 
+                envir
+            else new.env()
+            if (file_test("-f", file.path(p, "Rdata.rds"))) {
+                rds <- readRDS(file.path(p, "Rdata.rds"))
+                if (name %in% names(rds)) {
+                  found <- TRUE
+                  if (verbose) 
+                    message(sprintf("name=%s:\t found in Rdata.rds", 
+                      name), domain = NA)
+                  objs <- rds[[name]]
+                  lazyLoad(file.path(p, "Rdata"), envir = tmp_env, 
+                    filter = function(x) x %in% objs)
+                  break
+                }
+                else if (verbose) 
+                  message(sprintf("name=%s:\t NOT found in names() of Rdata.rds, i.e.,\n\t%s\n", 
+                    name, paste(names(rds), collapse = ",")), 
+                    domain = NA)
+            }
+            files <- list.files(p, full.names = TRUE)
+            files <- files[grep(name, files, fixed = TRUE)]
+            if (length(files) > 1L) {
+                o <- match(fileExt(files), dataExts, nomatch = 100L)
+                paths0 <- dirname(files)
+                paths0 <- factor(paths0, levels = unique(paths0))
+                files <- files[order(paths0, o)]
+            }
+            if (length(files)) {
+                for (file in files) {
+                  if (verbose) 
+                    message("name=", name, ":\t file= ...", .Platform$file.sep, 
+                      basename(file), "::\t", appendLF = FALSE, 
+                      domain = NA)
+                  ext <- fileExt(file)
+                  if (basename(file) != paste0(name, ".", ext)) 
+                    found <- FALSE
+                  else {
+                    found <- TRUE
+                    switch(ext, R = , r = {
+                      library("utils")
+                      sys.source(file, chdir = TRUE, envir = tmp_env)
+                    }, RData = , rdata = , rda = load(file, envir = tmp_env), 
+                      TXT = , txt = , tab = , tab.gz = , tab.bz2 = , 
+                      tab.xz = , txt.gz = , txt.bz2 = , txt.xz = assign(name, 
+                        my_read_table(file, header = TRUE, as.is = FALSE), 
+                        envir = tmp_env), CSV = , csv = , csv.gz = , 
+                      csv.bz2 = , csv.xz = assign(name, my_read_table(file, 
+                        header = TRUE, sep = ";", as.is = FALSE), 
+                        envir = tmp_env), found <- FALSE)
+                  }
+                  if (found) 
+                    break
+                }
+                if (verbose) 
+                  message(if (!found) 
+                    "*NOT* ", "found", domain = NA)
+            }
+            if (found) 
+                break
+        }
+        if (!found) {
+            warning(gettextf("data set %s not found", sQuote(name)), 
+                domain = NA)
+        }
+        else if (!overwrite) {
+            for (o in ls(envir = tmp_env, all.names = TRUE)) {
+                if (exists(o, envir = envir, inherits = FALSE)) 
+                  warning(gettextf("an object named %s already exists and will not be overwritten", 
+                    sQuote(o)))
+                else assign(o, get(o, envir = tmp_env, inherits = FALSE), 
+                  envir = envir)
+            }
+            rm(tmp_env)
+        }
+    }
+    invisible(names)
+}
+<bytecode: 0x558ce91dc068>
+<environment: namespace:utils>
 ```
 
-Notice the six new columns at the end of our data frame.
+Notice the six new columns at the end of our tibble.
 
 In our example above, the `checkin_time` column was read in correctly as a
 `Date` variable but generally that is not the case. Date columns are often read
@@ -978,6 +1289,48 @@ data2
 `Date1` and `Date2` store the exact same data! Lubridate is preferred to base R, 
 but either function can be used.
 
+## Outputting Data
+
+Occasionally, after editing a data set within RStudio, you may want to output the
+updated data set to a CSV file. This would allow you to open the updated information
+in Excel, Google Sheets, or a different RMarkdown file!
+
+To output a file to CSV, we will be using the `write_csv()` function from the 
+**`readr`** package. Below, we will be outputting our updated data with our new
+date and time columns as `"checkin_data_2.csv"`:
+
+
+``` r
+#takes the tibble and outputs it as a csv file
+write_csv(data, "data/checkin_data_2.csv")
+```
+
+``` error
+Error in write_delim(x, file, delim = ",", na = na, append = append, col_names = col_names, : is.data.frame(x) is not TRUE
+```
+
+When choosing the name for the new file, ensure there are no files with the same
+name. By default, `write_csv()` will overwrite any files of the same name without a
+warning!
+
+Additionally, you may have noticed we included the file path when specifying the 
+name of the new CSV. When creating any sort of new file -- whether that be an image, 
+CSV, or otherwise -- R will place the file in the current working directory! In 
+other words, R will always place new files in the same folder as the RMarkdown you're 
+working in, unless specified otherwise.
+
+Since we have a specific folder (called `"data"`) to store our csv files, we
+specify that we want the new CSV file to go in that folder by adding `"data/"`
+before the file name!
+
+If you want to output your new csv to a different file outside of the working 
+directory, you can use an entire file path (ex. 
+`"C:/Users/name/Documents/checkin_data_2.csv"`) to specify exactly where you 
+want the file to be saved.
+
+Note: similarly to reading in CSV files, **`readr`** has a alternate version of
+`write_csv()` called `write_csv2()` that uses commas as decimal separators and 
+semicolons as field delimiters.
 
 :::::::::::::::::::::::::::::::::::::::: keypoints
 
@@ -985,7 +1338,7 @@ but either function can be used.
 - Access rows and columns in a tibble in R.
 - Use factors to represent categorical data in R.
 - Use datetime to represent data in R.
-- Output a changed dataset to CSV in R.
+- Output an updated data set to CSV in R.
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
