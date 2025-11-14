@@ -18,12 +18,12 @@ on:
         default: ''
       reset:
         description: 'Reset cached markdown files'
-        required: false
+        required: true
         default: false
         type: boolean
       skip-manage-deps:
         description: 'Skip build-time dependency management'
-        required: false
+        required: true
         default: true
         type: boolean
   workflow_run:
