@@ -123,8 +123,8 @@ jobs:
         id: build-and-deploy
         uses: carpentries/actions/build-and-deploy@frog-s3-test-1
         with:
-          reset: ${{ github.event.inputs.reset }}
-          skip-manage-deps: ${{ github.event.inputs.skip-manage-deps }}
+          reset: ${{ github.event.inputs.reset || 'false' }}
+          skip-manage-deps: ${{ github.event.inputs.skip-manage-deps || 'true' }}
 
   update-container-version:
     name: "Update container version used"
