@@ -83,19 +83,9 @@ set:
 #load packages
 library(tidyverse)
 library(here)
-```
 
-``` error
-Error in library(here): there is no package called 'here'
-```
-
-``` r
 #read in data
 data <- read_csv(here("data", "checkin_data.csv"))
-```
-
-``` error
-Error in here("data", "checkin_data.csv"): could not find function "here"
 ```
 
 ## Selecting Columns
@@ -112,8 +102,21 @@ our data set, so our arguments will be `data` and `precinct`:
 select(data, precinct)
 ```
 
-``` error
-Error in UseMethod("select"): no applicable method for 'select' applied to an object of class "function"
+``` output
+# A tibble: 352,112 × 1
+   precinct    
+   <chr>       
+ 1 PRECINCT_001
+ 2 PRECINCT_001
+ 3 PRECINCT_001
+ 4 PRECINCT_001
+ 5 PRECINCT_001
+ 6 PRECINCT_001
+ 7 PRECINCT_001
+ 8 PRECINCT_001
+ 9 PRECINCT_001
+10 PRECINCT_001
+# ℹ 352,102 more rows
 ```
 
 Using the **`select`** function, you can also select MULTIPLE columns. This can 
@@ -126,8 +129,21 @@ practice to use dplyr functions when possible:
 select(data, precinct, checkin_time)
 ```
 
-``` error
-Error in UseMethod("select"): no applicable method for 'select' applied to an object of class "function"
+``` output
+# A tibble: 352,112 × 2
+   precinct     checkin_time       
+   <chr>        <dttm>             
+ 1 PRECINCT_001 2018-11-06 07:02:36
+ 2 PRECINCT_001 2018-11-06 07:04:09
+ 3 PRECINCT_001 2018-11-06 07:05:13
+ 4 PRECINCT_001 2018-11-06 07:06:26
+ 5 PRECINCT_001 2018-11-06 07:08:08
+ 6 PRECINCT_001 2018-11-06 07:08:32
+ 7 PRECINCT_001 2018-11-06 07:09:36
+ 8 PRECINCT_001 2018-11-06 07:10:18
+ 9 PRECINCT_001 2018-11-06 07:12:57
+10 PRECINCT_001 2018-11-06 07:13:41
+# ℹ 352,102 more rows
 ```
 
 In some cases, you may want to select multiple, adjacent columns. Instead of writing 
@@ -137,10 +153,6 @@ seen below:
 ``` r
 #selects all columns from checkin_time to precinct
 select(data, checkin_time:precinct)
-```
-
-``` error
-Error in UseMethod("select"): no applicable method for 'select' applied to an object of class "function"
 ```
 
 You can see a visualized example of the **`select()`** function on [tidy data tutor](https://tidydatatutor.com/vis.html#code=library%28dplyr%29%0Alibrary%28palmerpenguins%29%0A%0Aset.seed%282021-12-03%29%0A%0Asample_penguins%20%3C-%20penguins%20%25%3E%25%0A%20%20group_by%28species%29%20%25%3E%25%20%0A%20%20sample_n%283%29%20%25%3E%25%20%0A%20%20select%28species,%20island,%20bill_length_mm%29%20%25%3E%25%20%0A%20%20ungroup%28%29%0A%0Asample_penguins%20%25%3E%25%20%0A%20%20select%28species,%20bill_length_mm%29&d=2025-04-18&lang=r&v=v1)
@@ -158,8 +170,21 @@ case, we ONLY want rows where the precinct is "PRECINCT_001":
 filter(data, precinct == "PRECINCT_001")
 ```
 
-``` error
-Error in UseMethod("filter"): no applicable method for 'filter' applied to an object of class "function"
+``` output
+# A tibble: 648 × 6
+   checkin_id     checkin_length checkin_time        location    precinct device
+   <chr>                   <dbl> <dttm>              <chr>       <chr>    <chr> 
+ 1 CHECKIN_000001             45 2018-11-06 07:02:36 LOCATION_0… PRECINC… DEVIC…
+ 2 CHECKIN_000002             29 2018-11-06 07:04:09 LOCATION_0… PRECINC… DEVIC…
+ 3 CHECKIN_000003             65 2018-11-06 07:05:13 LOCATION_0… PRECINC… DEVIC…
+ 4 CHECKIN_000004             28 2018-11-06 07:06:26 LOCATION_0… PRECINC… DEVIC…
+ 5 CHECKIN_000005             17 2018-11-06 07:08:08 LOCATION_0… PRECINC… DEVIC…
+ 6 CHECKIN_000006             56 2018-11-06 07:08:32 LOCATION_0… PRECINC… DEVIC…
+ 7 CHECKIN_000007             64 2018-11-06 07:09:36 LOCATION_0… PRECINC… DEVIC…
+ 8 CHECKIN_000008            262 2018-11-06 07:10:18 LOCATION_0… PRECINC… DEVIC…
+ 9 CHECKIN_000009            245 2018-11-06 07:12:57 LOCATION_0… PRECINC… DEVIC…
+10 CHECKIN_000010            260 2018-11-06 07:13:41 LOCATION_0… PRECINC… DEVIC…
+# ℹ 638 more rows
 ```
 
 You can also use comparison operators within **`filter()`** arguments! This includes 
@@ -174,8 +199,21 @@ or equal-to 20 seconds:
 filter(data, checkin_length <= 20)
 ```
 
-``` error
-Error in UseMethod("filter"): no applicable method for 'filter' applied to an object of class "function"
+``` output
+# A tibble: 32,264 × 6
+   checkin_id     checkin_length checkin_time        location    precinct device
+   <chr>                   <dbl> <dttm>              <chr>       <chr>    <chr> 
+ 1 CHECKIN_000005             17 2018-11-06 07:08:08 LOCATION_0… PRECINC… DEVIC…
+ 2 CHECKIN_000017             19 2018-11-06 07:20:40 LOCATION_0… PRECINC… DEVIC…
+ 3 CHECKIN_000059             19 2018-11-06 08:07:12 LOCATION_0… PRECINC… DEVIC…
+ 4 CHECKIN_000079             20 2018-11-06 08:25:41 LOCATION_0… PRECINC… DEVIC…
+ 5 CHECKIN_000092             18 2018-11-06 08:37:45 LOCATION_0… PRECINC… DEVIC…
+ 6 CHECKIN_000094             19 2018-11-06 08:39:38 LOCATION_0… PRECINC… DEVIC…
+ 7 CHECKIN_000119             17 2018-11-06 08:57:22 LOCATION_0… PRECINC… DEVIC…
+ 8 CHECKIN_000162             19 2018-11-06 09:30:57 LOCATION_0… PRECINC… DEVIC…
+ 9 CHECKIN_000163             20 2018-11-06 09:32:14 LOCATION_0… PRECINC… DEVIC…
+10 CHECKIN_000190             18 2018-11-06 09:49:41 LOCATION_0… PRECINC… DEVIC…
+# ℹ 32,254 more rows
 ```
 
 Similarly to the **`select()`** function, the **`filter()`** function also allows 
@@ -195,8 +233,21 @@ as the device:
 filter(data, precinct == "PRECINCT_001" & device == "DEVICE_002")
 ```
 
-``` error
-Error in UseMethod("filter"): no applicable method for 'filter' applied to an object of class "function"
+``` output
+# A tibble: 265 × 6
+   checkin_id     checkin_length checkin_time        location    precinct device
+   <chr>                   <dbl> <dttm>              <chr>       <chr>    <chr> 
+ 1 CHECKIN_000006             56 2018-11-06 07:08:32 LOCATION_0… PRECINC… DEVIC…
+ 2 CHECKIN_000009            245 2018-11-06 07:12:57 LOCATION_0… PRECINC… DEVIC…
+ 3 CHECKIN_000019             41 2018-11-06 07:23:05 LOCATION_0… PRECINC… DEVIC…
+ 4 CHECKIN_000026             22 2018-11-06 07:33:38 LOCATION_0… PRECINC… DEVIC…
+ 5 CHECKIN_000028             21 2018-11-06 07:35:44 LOCATION_0… PRECINC… DEVIC…
+ 6 CHECKIN_000031             33 2018-11-06 07:37:36 LOCATION_0… PRECINC… DEVIC…
+ 7 CHECKIN_000041             56 2018-11-06 07:49:06 LOCATION_0… PRECINC… DEVIC…
+ 8 CHECKIN_000044             23 2018-11-06 07:52:08 LOCATION_0… PRECINC… DEVIC…
+ 9 CHECKIN_000046             24 2018-11-06 07:54:06 LOCATION_0… PRECINC… DEVIC…
+10 CHECKIN_000057             48 2018-11-06 08:05:54 LOCATION_0… PRECINC… DEVIC…
+# ℹ 255 more rows
 ```
 
 In an ‘or’ statement, an observation (row) must meet *at least one* criteria to 
@@ -212,8 +263,21 @@ precinct:
 filter(data, precinct == "PRECINCT_001" | precinct == "PRECINCT_002")
 ```
 
-``` error
-Error in UseMethod("filter"): no applicable method for 'filter' applied to an object of class "function"
+``` output
+# A tibble: 905 × 6
+   checkin_id     checkin_length checkin_time        location    precinct device
+   <chr>                   <dbl> <dttm>              <chr>       <chr>    <chr> 
+ 1 CHECKIN_000001             45 2018-11-06 07:02:36 LOCATION_0… PRECINC… DEVIC…
+ 2 CHECKIN_000002             29 2018-11-06 07:04:09 LOCATION_0… PRECINC… DEVIC…
+ 3 CHECKIN_000003             65 2018-11-06 07:05:13 LOCATION_0… PRECINC… DEVIC…
+ 4 CHECKIN_000004             28 2018-11-06 07:06:26 LOCATION_0… PRECINC… DEVIC…
+ 5 CHECKIN_000005             17 2018-11-06 07:08:08 LOCATION_0… PRECINC… DEVIC…
+ 6 CHECKIN_000006             56 2018-11-06 07:08:32 LOCATION_0… PRECINC… DEVIC…
+ 7 CHECKIN_000007             64 2018-11-06 07:09:36 LOCATION_0… PRECINC… DEVIC…
+ 8 CHECKIN_000008            262 2018-11-06 07:10:18 LOCATION_0… PRECINC… DEVIC…
+ 9 CHECKIN_000009            245 2018-11-06 07:12:57 LOCATION_0… PRECINC… DEVIC…
+10 CHECKIN_000010            260 2018-11-06 07:13:41 LOCATION_0… PRECINC… DEVIC…
+# ℹ 895 more rows
 ```
 
 
@@ -234,19 +298,26 @@ objects in your R environment.
 ``` r
 #step 1: apply filter function and save it to a new object (filtered_data)
 filtered_data <- filter(data, precinct == "PRECINCT_005")
-```
 
-``` error
-Error in UseMethod("filter"): no applicable method for 'filter' applied to an object of class "function"
-```
-
-``` r
 #step 2: apply select function on the filtered_data object
 select(filtered_data, precinct, checkin_time)
 ```
 
-``` error
-Error: object 'filtered_data' not found
+``` output
+# A tibble: 762 × 2
+   precinct     checkin_time       
+   <chr>        <dttm>             
+ 1 PRECINCT_005 2018-11-06 11:39:28
+ 2 PRECINCT_005 2018-11-06 11:26:09
+ 3 PRECINCT_005 2018-11-06 18:25:45
+ 4 PRECINCT_005 2018-11-06 07:01:07
+ 5 PRECINCT_005 2018-11-06 07:01:22
+ 6 PRECINCT_005 2018-11-06 07:02:02
+ 7 PRECINCT_005 2018-11-06 07:02:02
+ 8 PRECINCT_005 2018-11-06 07:02:38
+ 9 PRECINCT_005 2018-11-06 07:02:50
+10 PRECINCT_005 2018-11-06 07:03:23
+# ℹ 752 more rows
 ```
 
 2. Nested Functions: 
@@ -259,8 +330,21 @@ if more than two functions are put together.
 select(filter(data, precinct == "PRECINCT_005"), precinct, checkin_time)
 ```
 
-``` error
-Error in UseMethod("filter"): no applicable method for 'filter' applied to an object of class "function"
+``` output
+# A tibble: 762 × 2
+   precinct     checkin_time       
+   <chr>        <dttm>             
+ 1 PRECINCT_005 2018-11-06 11:39:28
+ 2 PRECINCT_005 2018-11-06 11:26:09
+ 3 PRECINCT_005 2018-11-06 18:25:45
+ 4 PRECINCT_005 2018-11-06 07:01:07
+ 5 PRECINCT_005 2018-11-06 07:01:22
+ 6 PRECINCT_005 2018-11-06 07:02:02
+ 7 PRECINCT_005 2018-11-06 07:02:02
+ 8 PRECINCT_005 2018-11-06 07:02:38
+ 9 PRECINCT_005 2018-11-06 07:02:50
+10 PRECINCT_005 2018-11-06 07:03:23
+# ℹ 752 more rows
 ```
 
 3. Using Pipes: 
@@ -276,8 +360,21 @@ data %>%
   select(precinct, checkin_time)
 ```
 
-``` error
-Error in UseMethod("filter"): no applicable method for 'filter' applied to an object of class "function"
+``` output
+# A tibble: 762 × 2
+   precinct     checkin_time       
+   <chr>        <dttm>             
+ 1 PRECINCT_005 2018-11-06 11:39:28
+ 2 PRECINCT_005 2018-11-06 11:26:09
+ 3 PRECINCT_005 2018-11-06 18:25:45
+ 4 PRECINCT_005 2018-11-06 07:01:07
+ 5 PRECINCT_005 2018-11-06 07:01:22
+ 6 PRECINCT_005 2018-11-06 07:02:02
+ 7 PRECINCT_005 2018-11-06 07:02:02
+ 8 PRECINCT_005 2018-11-06 07:02:38
+ 9 PRECINCT_005 2018-11-06 07:02:50
+10 PRECINCT_005 2018-11-06 07:03:23
+# ℹ 752 more rows
 ```
 
 In the above code, you may have noticed that the `data` data set was not included 
@@ -313,8 +410,21 @@ data %>%
   select(precinct, checkin_time, device)
 ```
 
-``` error
-Error in UseMethod("filter"): no applicable method for 'filter' applied to an object of class "function"
+``` output
+# A tibble: 134 × 3
+   precinct     checkin_time        device    
+   <chr>        <dttm>              <chr>     
+ 1 PRECINCT_332 2018-11-06 07:02:26 DEVICE_738
+ 2 PRECINCT_332 2018-11-06 07:03:10 DEVICE_738
+ 3 PRECINCT_332 2018-11-06 07:03:56 DEVICE_738
+ 4 PRECINCT_332 2018-11-06 07:04:27 DEVICE_738
+ 5 PRECINCT_332 2018-11-06 07:05:01 DEVICE_738
+ 6 PRECINCT_332 2018-11-06 07:06:00 DEVICE_738
+ 7 PRECINCT_332 2018-11-06 07:06:36 DEVICE_738
+ 8 PRECINCT_332 2018-11-06 07:07:03 DEVICE_738
+ 9 PRECINCT_332 2018-11-06 07:07:45 DEVICE_738
+10 PRECINCT_332 2018-11-06 07:08:24 DEVICE_738
+# ℹ 124 more rows
 ```
 :::::::::::::::::::::::::
 
@@ -350,8 +460,22 @@ data %>%
   filter(checkin_length == max(checkin_length))
 ```
 
-``` error
-Error in UseMethod("group_by"): no applicable method for 'group_by' applied to an object of class "function"
+``` output
+# A tibble: 561 × 6
+# Groups:   location [417]
+   checkin_id     checkin_length checkin_time        location    precinct device
+   <chr>                   <dbl> <dttm>              <chr>       <chr>    <chr> 
+ 1 CHECKIN_000032            300 2018-11-06 07:37:43 LOCATION_0… PRECINC… DEVIC…
+ 2 CHECKIN_000106            300 2018-11-06 08:51:39 LOCATION_0… PRECINC… DEVIC…
+ 3 CHECKIN_000640            300 2018-11-06 19:47:13 LOCATION_0… PRECINC… DEVIC…
+ 4 CHECKIN_000839            300 2018-11-06 16:50:29 LOCATION_0… PRECINC… DEVIC…
+ 5 CHECKIN_001137            299 2018-11-06 10:03:21 LOCATION_0… PRECINC… DEVIC…
+ 6 CHECKIN_002362            298 2018-11-06 19:09:12 LOCATION_0… PRECINC… DEVIC…
+ 7 CHECKIN_002572            299 2018-11-06 10:46:01 LOCATION_0… PRECINC… DEVIC…
+ 8 CHECKIN_003919            300 2018-11-06 18:05:53 LOCATION_0… PRECINC… DEVIC…
+ 9 CHECKIN_004805            298 2018-11-06 17:57:33 LOCATION_0… PRECINC… DEVIC…
+10 CHECKIN_005944            300 2018-11-06 16:17:04 LOCATION_0… PRECINC… DEVIC…
+# ℹ 551 more rows
 ```
 
 Additionally, when multiple columns are provided, **``group_by()`** goes from 
@@ -368,8 +492,22 @@ data %>%
   filter(checkin_length == max(checkin_length))
 ```
 
-``` error
-Error in UseMethod("group_by"): no applicable method for 'group_by' applied to an object of class "function"
+``` output
+# A tibble: 1,344 × 6
+# Groups:   location, device [1,215]
+   checkin_id     checkin_length checkin_time        location    precinct device
+   <chr>                   <dbl> <dttm>              <chr>       <chr>    <chr> 
+ 1 CHECKIN_000032            300 2018-11-06 07:37:43 LOCATION_0… PRECINC… DEVIC…
+ 2 CHECKIN_000106            300 2018-11-06 08:51:39 LOCATION_0… PRECINC… DEVIC…
+ 3 CHECKIN_000640            300 2018-11-06 19:47:13 LOCATION_0… PRECINC… DEVIC…
+ 4 CHECKIN_000774            295 2018-11-06 12:52:23 LOCATION_0… PRECINC… DEVIC…
+ 5 CHECKIN_000839            300 2018-11-06 16:50:29 LOCATION_0… PRECINC… DEVIC…
+ 6 CHECKIN_001015            296 2018-11-06 08:36:18 LOCATION_0… PRECINC… DEVIC…
+ 7 CHECKIN_001137            299 2018-11-06 10:03:21 LOCATION_0… PRECINC… DEVIC…
+ 8 CHECKIN_001792            290 2018-11-06 08:00:47 LOCATION_0… PRECINC… DEVIC…
+ 9 CHECKIN_002210             75 2018-11-06 16:11:09 LOCATION_0… PRECINC… DEVIC…
+10 CHECKIN_002362            298 2018-11-06 19:09:12 LOCATION_0… PRECINC… DEVIC…
+# ℹ 1,334 more rows
 ```
 
 As you can see, there are additional rows, since we are looking at the longest check-in
@@ -385,8 +523,21 @@ data %>%
   ungroup()
 ```
 
-``` error
-Error in UseMethod("group_by"): no applicable method for 'group_by' applied to an object of class "function"
+``` output
+# A tibble: 1,344 × 6
+   checkin_id     checkin_length checkin_time        location    precinct device
+   <chr>                   <dbl> <dttm>              <chr>       <chr>    <chr> 
+ 1 CHECKIN_000032            300 2018-11-06 07:37:43 LOCATION_0… PRECINC… DEVIC…
+ 2 CHECKIN_000106            300 2018-11-06 08:51:39 LOCATION_0… PRECINC… DEVIC…
+ 3 CHECKIN_000640            300 2018-11-06 19:47:13 LOCATION_0… PRECINC… DEVIC…
+ 4 CHECKIN_000774            295 2018-11-06 12:52:23 LOCATION_0… PRECINC… DEVIC…
+ 5 CHECKIN_000839            300 2018-11-06 16:50:29 LOCATION_0… PRECINC… DEVIC…
+ 6 CHECKIN_001015            296 2018-11-06 08:36:18 LOCATION_0… PRECINC… DEVIC…
+ 7 CHECKIN_001137            299 2018-11-06 10:03:21 LOCATION_0… PRECINC… DEVIC…
+ 8 CHECKIN_001792            290 2018-11-06 08:00:47 LOCATION_0… PRECINC… DEVIC…
+ 9 CHECKIN_002210             75 2018-11-06 16:11:09 LOCATION_0… PRECINC… DEVIC…
+10 CHECKIN_002362            298 2018-11-06 19:09:12 LOCATION_0… PRECINC… DEVIC…
+# ℹ 1,334 more rows
 ```
 
 The final table will no longer be considered “grouped”, which can be helpful if
@@ -415,8 +566,21 @@ data %>%
   summarize(total_checkins = n())
 ```
 
-``` error
-Error in UseMethod("group_by"): no applicable method for 'group_by' applied to an object of class "function"
+``` output
+# A tibble: 420 × 2
+   precinct     total_checkins
+   <chr>                 <int>
+ 1 PRECINCT_001            648
+ 2 PRECINCT_002            257
+ 3 PRECINCT_003            806
+ 4 PRECINCT_004            466
+ 5 PRECINCT_005            762
+ 6 PRECINCT_006            676
+ 7 PRECINCT_007           1347
+ 8 PRECINCT_008           1652
+ 9 PRECINCT_009            742
+10 PRECINCT_010            882
+# ℹ 410 more rows
 ```
 
 We can also apply **``summarize()`** on data that has been grouped by multiple 
@@ -429,8 +593,27 @@ data %>%
   summarize(total_checkins = n())
 ```
 
-``` error
-Error in UseMethod("group_by"): no applicable method for 'group_by' applied to an object of class "function"
+``` output
+`summarise()` has grouped output by 'precinct'. You can override using the
+`.groups` argument.
+```
+
+``` output
+# A tibble: 1,778 × 3
+# Groups:   precinct [420]
+   precinct     device     total_checkins
+   <chr>        <chr>               <int>
+ 1 PRECINCT_001 DEVICE_001            381
+ 2 PRECINCT_001 DEVICE_002            265
+ 3 PRECINCT_001 DEVICE_671              1
+ 4 PRECINCT_001 DEVICE_844              1
+ 5 PRECINCT_002 DEVICE_003            125
+ 6 PRECINCT_002 DEVICE_004            131
+ 7 PRECINCT_002 DEVICE_536              1
+ 8 PRECINCT_003 DEVICE_005            449
+ 9 PRECINCT_003 DEVICE_006            357
+10 PRECINCT_004 DEVICE_006              1
+# ℹ 1,768 more rows
 ```
 
 You’re not limited to a single summary statistic, either! For example, you might 
@@ -446,8 +629,21 @@ data %>%
   )
 ```
 
-``` error
-Error in UseMethod("group_by"): no applicable method for 'group_by' applied to an object of class "function"
+``` output
+# A tibble: 420 × 3
+   precinct     total_checkins unique_devices
+   <chr>                 <int>          <int>
+ 1 PRECINCT_001            648              4
+ 2 PRECINCT_002            257              3
+ 3 PRECINCT_003            806              2
+ 4 PRECINCT_004            466              5
+ 5 PRECINCT_005            762              5
+ 6 PRECINCT_006            676              2
+ 7 PRECINCT_007           1347              5
+ 8 PRECINCT_008           1652              5
+ 9 PRECINCT_009            742              7
+10 PRECINCT_010            882              6
+# ℹ 410 more rows
 ```
 
 Additionally, if you need to exclude certain rows before summarizing, ensure you use 
@@ -461,8 +657,11 @@ data %>%
   summarize(total_checkins = n())
 ```
 
-``` error
-Error in UseMethod("filter"): no applicable method for 'filter' applied to an object of class "function"
+``` output
+# A tibble: 1 × 2
+  precinct     total_checkins
+  <chr>                 <int>
+1 PRECINCT_001            646
 ```
 
 Additional examples of the **`group_by()`** and **`summarize()`** functions can 
@@ -481,8 +680,21 @@ data %>%
   arrange(total_checkins)
 ```
 
-``` error
-Error in UseMethod("group_by"): no applicable method for 'group_by' applied to an object of class "function"
+``` output
+# A tibble: 420 × 2
+   precinct     total_checkins
+   <chr>                 <int>
+ 1 PRECINCT_092              2
+ 2 PRECINCT_360             11
+ 3 PRECINCT_411             37
+ 4 PRECINCT_345             42
+ 5 PRECINCT_101             43
+ 6 PRECINCT_253             58
+ 7 PRECINCT_355             60
+ 8 PRECINCT_175             64
+ 9 PRECINCT_031             66
+10 PRECINCT_403             68
+# ℹ 410 more rows
 ```
 
 Or, to instead arrange from highest to lowest, include desc() around the **`arrange()`**
@@ -514,8 +726,21 @@ data %>%
     count(precinct)
 ```
 
-``` error
-Error in UseMethod("count"): no applicable method for 'count' applied to an object of class "function"
+``` output
+# A tibble: 420 × 2
+   precinct         n
+   <chr>        <int>
+ 1 PRECINCT_001   648
+ 2 PRECINCT_002   257
+ 3 PRECINCT_003   806
+ 4 PRECINCT_004   466
+ 5 PRECINCT_005   762
+ 6 PRECINCT_006   676
+ 7 PRECINCT_007  1347
+ 8 PRECINCT_008  1652
+ 9 PRECINCT_009   742
+10 PRECINCT_010   882
+# ℹ 410 more rows
 ```
 
 Additionally, if you'd like your results sorted, instead of using the **`arrange()`**
@@ -527,8 +752,21 @@ data %>%
     count(precinct, sort = TRUE)
 ```
 
-``` error
-Error in UseMethod("count"): no applicable method for 'count' applied to an object of class "function"
+``` output
+# A tibble: 420 × 2
+   precinct         n
+   <chr>        <int>
+ 1 PRECINCT_219  1968
+ 2 PRECINCT_016  1807
+ 3 PRECINCT_271  1798
+ 4 PRECINCT_317  1731
+ 5 PRECINCT_358  1717
+ 6 PRECINCT_239  1705
+ 7 PRECINCT_199  1700
+ 8 PRECINCT_323  1695
+ 9 PRECINCT_106  1680
+10 PRECINCT_045  1671
+# ℹ 410 more rows
 ```
 
 :::::::::::::::::::::::::::::::::::::::  challenge
@@ -548,8 +786,21 @@ data %>%
     count(device, sort = TRUE)
 ```
 
-``` error
-Error in UseMethod("count"): no applicable method for 'count' applied to an object of class "function"
+``` output
+# A tibble: 1,215 × 2
+   device         n
+   <chr>      <int>
+ 1 DEVICE_255   898
+ 2 DEVICE_190   894
+ 3 DEVICE_642   887
+ 4 DEVICE_178   850
+ 5 DEVICE_435   821
+ 6 DEVICE_960   817
+ 7 DEVICE_959   812
+ 8 DEVICE_436   796
+ 9 DEVICE_641   782
+10 DEVICE_822   769
+# ℹ 1,205 more rows
 ```
 
 "DEVICE_255" has the highest number of check ins, with 898 recorded!
@@ -573,8 +824,15 @@ data %>%
   arrange(desc(total_checkins))
 ```
 
-``` error
-Error in UseMethod("filter"): no applicable method for 'filter' applied to an object of class "function"
+``` output
+# A tibble: 5 × 2
+  device     total_checkins
+  <chr>               <int>
+1 DEVICE_919            462
+2 DEVICE_917            448
+3 DEVICE_918            426
+4 DEVICE_920             10
+5 DEVICE_009              1
 ```
 
 "DEVICE_009" had the least amount of check-ins, recording only 1.
@@ -602,8 +860,22 @@ data %>%
     mutate(checkin_length_min = checkin_length / 60)
 ```
 
-``` error
-Error in UseMethod("mutate"): no applicable method for 'mutate' applied to an object of class "function"
+``` output
+# A tibble: 352,112 × 7
+   checkin_id     checkin_length checkin_time        location    precinct device
+   <chr>                   <dbl> <dttm>              <chr>       <chr>    <chr> 
+ 1 CHECKIN_000001             45 2018-11-06 07:02:36 LOCATION_0… PRECINC… DEVIC…
+ 2 CHECKIN_000002             29 2018-11-06 07:04:09 LOCATION_0… PRECINC… DEVIC…
+ 3 CHECKIN_000003             65 2018-11-06 07:05:13 LOCATION_0… PRECINC… DEVIC…
+ 4 CHECKIN_000004             28 2018-11-06 07:06:26 LOCATION_0… PRECINC… DEVIC…
+ 5 CHECKIN_000005             17 2018-11-06 07:08:08 LOCATION_0… PRECINC… DEVIC…
+ 6 CHECKIN_000006             56 2018-11-06 07:08:32 LOCATION_0… PRECINC… DEVIC…
+ 7 CHECKIN_000007             64 2018-11-06 07:09:36 LOCATION_0… PRECINC… DEVIC…
+ 8 CHECKIN_000008            262 2018-11-06 07:10:18 LOCATION_0… PRECINC… DEVIC…
+ 9 CHECKIN_000009            245 2018-11-06 07:12:57 LOCATION_0… PRECINC… DEVIC…
+10 CHECKIN_000010            260 2018-11-06 07:13:41 LOCATION_0… PRECINC… DEVIC…
+# ℹ 352,102 more rows
+# ℹ 1 more variable: checkin_length_min <dbl>
 ```
 
 Admittedly, this operation doesn't tell us anything additional about our data, as 
@@ -619,8 +891,22 @@ data %>%
   mutate(checkin_category = ifelse(checkin_length >= 200, "abnormal", "normal"))
 ```
 
-``` error
-Error in UseMethod("mutate"): no applicable method for 'mutate' applied to an object of class "function"
+``` output
+# A tibble: 352,112 × 7
+   checkin_id     checkin_length checkin_time        location    precinct device
+   <chr>                   <dbl> <dttm>              <chr>       <chr>    <chr> 
+ 1 CHECKIN_000001             45 2018-11-06 07:02:36 LOCATION_0… PRECINC… DEVIC…
+ 2 CHECKIN_000002             29 2018-11-06 07:04:09 LOCATION_0… PRECINC… DEVIC…
+ 3 CHECKIN_000003             65 2018-11-06 07:05:13 LOCATION_0… PRECINC… DEVIC…
+ 4 CHECKIN_000004             28 2018-11-06 07:06:26 LOCATION_0… PRECINC… DEVIC…
+ 5 CHECKIN_000005             17 2018-11-06 07:08:08 LOCATION_0… PRECINC… DEVIC…
+ 6 CHECKIN_000006             56 2018-11-06 07:08:32 LOCATION_0… PRECINC… DEVIC…
+ 7 CHECKIN_000007             64 2018-11-06 07:09:36 LOCATION_0… PRECINC… DEVIC…
+ 8 CHECKIN_000008            262 2018-11-06 07:10:18 LOCATION_0… PRECINC… DEVIC…
+ 9 CHECKIN_000009            245 2018-11-06 07:12:57 LOCATION_0… PRECINC… DEVIC…
+10 CHECKIN_000010            260 2018-11-06 07:13:41 LOCATION_0… PRECINC… DEVIC…
+# ℹ 352,102 more rows
+# ℹ 1 more variable: checkin_category <chr>
 ```
 
 This code filters out duplicate entries, showing just one record for each unique precinct and the new column we just added.
@@ -655,8 +941,11 @@ avg_checkins <- data %>%
   arrange(precinct)
 ```
 
-``` error
-Error in UseMethod("mutate"): no applicable method for 'mutate' applied to an object of class "function"
+``` warning
+Warning: There was 1 warning in `mutate()`.
+ℹ In argument: `precinct = as.numeric(str_remove(precinct, "PRECINCT_0"))`.
+Caused by warning:
+! NAs introduced by coercion
 ```
 
 :::::::::::::::::::::::::
@@ -670,10 +959,6 @@ Save your new "avg_checkins" into your data folder as "avg_checkins.csv"!
 
 ``` r
 write_csv(avg_checkins, "data/avg_checkins.csv")
-```
-
-``` error
-Error: object 'avg_checkins' not found
 ```
 
 :::::::::::::::::::::::::

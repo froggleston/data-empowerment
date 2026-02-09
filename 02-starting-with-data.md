@@ -185,19 +185,9 @@ tidyverse and here packages.
 #loads in the tidyverse and here packages
 library(tidyverse)
 library(here)
-```
 
-``` error
-Error in library(here): there is no package called 'here'
-```
-
-``` r
 #reads in data and assigns it to the 'data' variable using 'here'
 data <- read_csv(here("data", "checkin_data.csv"))
-```
-
-``` error
-Error in here("data", "checkin_data.csv"): could not find function "here"
 ```
 
 In the above code, we notice the `here()` function takes folder and file names
@@ -247,158 +237,20 @@ data
 ```
 
 ``` output
-function (..., list = character(), package = NULL, lib.loc = NULL, 
-    verbose = getOption("verbose"), envir = .GlobalEnv, overwrite = TRUE) 
-{
-    fileExt <- function(x) {
-        db <- grepl("\\.[^.]+\\.(gz|bz2|xz)$", x)
-        ans <- sub(".*\\.", "", x)
-        ans[db] <- sub(".*\\.([^.]+\\.)(gz|bz2|xz)$", "\\1\\2", 
-            x[db])
-        ans
-    }
-    my_read_table <- function(...) {
-        lcc <- Sys.getlocale("LC_COLLATE")
-        on.exit(Sys.setlocale("LC_COLLATE", lcc))
-        Sys.setlocale("LC_COLLATE", "C")
-        read.table(...)
-    }
-    stopifnot(is.character(list))
-    names <- c(as.character(substitute(list(...))[-1L]), list)
-    if (!is.null(package)) {
-        if (!is.character(package)) 
-            stop("'package' must be a character vector or NULL")
-    }
-    paths <- find.package(package, lib.loc, verbose = verbose)
-    if (is.null(lib.loc)) 
-        paths <- c(path.package(package, TRUE), if (!length(package)) getwd(), 
-            paths)
-    paths <- unique(normalizePath(paths[file.exists(paths)]))
-    paths <- paths[dir.exists(file.path(paths, "data"))]
-    dataExts <- tools:::.make_file_exts("data")
-    if (length(names) == 0L) {
-        db <- matrix(character(), nrow = 0L, ncol = 4L)
-        for (path in paths) {
-            entries <- NULL
-            packageName <- if (file_test("-f", file.path(path, 
-                "DESCRIPTION"))) 
-                basename(path)
-            else "."
-            if (file_test("-f", INDEX <- file.path(path, "Meta", 
-                "data.rds"))) {
-                entries <- readRDS(INDEX)
-            }
-            else {
-                dataDir <- file.path(path, "data")
-                entries <- tools::list_files_with_type(dataDir, 
-                  "data")
-                if (length(entries)) {
-                  entries <- unique(tools::file_path_sans_ext(basename(entries)))
-                  entries <- cbind(entries, "")
-                }
-            }
-            if (NROW(entries)) {
-                if (is.matrix(entries) && ncol(entries) == 2L) 
-                  db <- rbind(db, cbind(packageName, dirname(path), 
-                    entries))
-                else warning(gettextf("data index for package %s is invalid and will be ignored", 
-                  sQuote(packageName)), domain = NA, call. = FALSE)
-            }
-        }
-        colnames(db) <- c("Package", "LibPath", "Item", "Title")
-        footer <- if (missing(package)) 
-            paste0("Use ", sQuote(paste("data(package =", ".packages(all.available = TRUE))")), 
-                "\n", "to list the data sets in all *available* packages.")
-        else NULL
-        y <- list(title = "Data sets", header = NULL, results = db, 
-            footer = footer)
-        class(y) <- "packageIQR"
-        return(y)
-    }
-    paths <- file.path(paths, "data")
-    for (name in names) {
-        found <- FALSE
-        for (p in paths) {
-            tmp_env <- if (overwrite) 
-                envir
-            else new.env()
-            if (file_test("-f", file.path(p, "Rdata.rds"))) {
-                rds <- readRDS(file.path(p, "Rdata.rds"))
-                if (name %in% names(rds)) {
-                  found <- TRUE
-                  if (verbose) 
-                    message(sprintf("name=%s:\t found in Rdata.rds", 
-                      name), domain = NA)
-                  objs <- rds[[name]]
-                  lazyLoad(file.path(p, "Rdata"), envir = tmp_env, 
-                    filter = function(x) x %in% objs)
-                  break
-                }
-                else if (verbose) 
-                  message(sprintf("name=%s:\t NOT found in names() of Rdata.rds, i.e.,\n\t%s\n", 
-                    name, paste(names(rds), collapse = ",")), 
-                    domain = NA)
-            }
-            files <- list.files(p, full.names = TRUE)
-            files <- files[grep(name, files, fixed = TRUE)]
-            if (length(files) > 1L) {
-                o <- match(fileExt(files), dataExts, nomatch = 100L)
-                paths0 <- dirname(files)
-                paths0 <- factor(paths0, levels = unique(paths0))
-                files <- files[order(paths0, o)]
-            }
-            if (length(files)) {
-                for (file in files) {
-                  if (verbose) 
-                    message("name=", name, ":\t file= ...", .Platform$file.sep, 
-                      basename(file), "::\t", appendLF = FALSE, 
-                      domain = NA)
-                  ext <- fileExt(file)
-                  if (basename(file) != paste0(name, ".", ext)) 
-                    found <- FALSE
-                  else {
-                    found <- TRUE
-                    switch(ext, R = , r = {
-                      library("utils")
-                      sys.source(file, chdir = TRUE, envir = tmp_env)
-                    }, RData = , rdata = , rda = load(file, envir = tmp_env), 
-                      TXT = , txt = , tab = , tab.gz = , tab.bz2 = , 
-                      tab.xz = , txt.gz = , txt.bz2 = , txt.xz = assign(name, 
-                        my_read_table(file, header = TRUE, as.is = FALSE), 
-                        envir = tmp_env), CSV = , csv = , csv.gz = , 
-                      csv.bz2 = , csv.xz = assign(name, my_read_table(file, 
-                        header = TRUE, sep = ";", as.is = FALSE), 
-                        envir = tmp_env), found <- FALSE)
-                  }
-                  if (found) 
-                    break
-                }
-                if (verbose) 
-                  message(if (!found) 
-                    "*NOT* ", "found", domain = NA)
-            }
-            if (found) 
-                break
-        }
-        if (!found) {
-            warning(gettextf("data set %s not found", sQuote(name)), 
-                domain = NA)
-        }
-        else if (!overwrite) {
-            for (o in ls(envir = tmp_env, all.names = TRUE)) {
-                if (exists(o, envir = envir, inherits = FALSE)) 
-                  warning(gettextf("an object named %s already exists and will not be overwritten", 
-                    sQuote(o)))
-                else assign(o, get(o, envir = tmp_env, inherits = FALSE), 
-                  envir = envir)
-            }
-            rm(tmp_env)
-        }
-    }
-    invisible(names)
-}
-<bytecode: 0x56544ab08068>
-<environment: namespace:utils>
+# A tibble: 352,112 × 6
+   checkin_id     checkin_length checkin_time        location    precinct device
+   <chr>                   <dbl> <dttm>              <chr>       <chr>    <chr> 
+ 1 CHECKIN_000001             45 2018-11-06 07:02:36 LOCATION_0… PRECINC… DEVIC…
+ 2 CHECKIN_000002             29 2018-11-06 07:04:09 LOCATION_0… PRECINC… DEVIC…
+ 3 CHECKIN_000003             65 2018-11-06 07:05:13 LOCATION_0… PRECINC… DEVIC…
+ 4 CHECKIN_000004             28 2018-11-06 07:06:26 LOCATION_0… PRECINC… DEVIC…
+ 5 CHECKIN_000005             17 2018-11-06 07:08:08 LOCATION_0… PRECINC… DEVIC…
+ 6 CHECKIN_000006             56 2018-11-06 07:08:32 LOCATION_0… PRECINC… DEVIC…
+ 7 CHECKIN_000007             64 2018-11-06 07:09:36 LOCATION_0… PRECINC… DEVIC…
+ 8 CHECKIN_000008            262 2018-11-06 07:10:18 LOCATION_0… PRECINC… DEVIC…
+ 9 CHECKIN_000009            245 2018-11-06 07:12:57 LOCATION_0… PRECINC… DEVIC…
+10 CHECKIN_000010            260 2018-11-06 07:13:41 LOCATION_0… PRECINC… DEVIC…
+# ℹ 352,102 more rows
 ```
 
 :::::::::::::::::::::::::::::::::::::::::  callout
@@ -426,7 +278,7 @@ class(data)
 ```
 
 ``` output
-[1] "function"
+[1] "spec_tbl_df" "tbl_df"      "tbl"         "data.frame" 
 ```
 
 As a `tibble`, the type of data included in each column is listed in an
@@ -503,8 +355,11 @@ different classes. This is covered in the Software Carpentry lesson
 data[1, 1]
 ```
 
-``` error
-Error in data[1, 1]: object of type 'closure' is not subsettable
+``` output
+# A tibble: 1 × 1
+  checkin_id    
+  <chr>         
+1 CHECKIN_000001
 ```
 
 ``` r
@@ -512,8 +367,11 @@ Error in data[1, 1]: object of type 'closure' is not subsettable
 data[1, 5]
 ```
 
-``` error
-Error in data[1, 5]: object of type 'closure' is not subsettable
+``` output
+# A tibble: 1 × 1
+  precinct    
+  <chr>       
+1 PRECINCT_001
 ```
 
 ``` r
@@ -521,8 +379,21 @@ Error in data[1, 5]: object of type 'closure' is not subsettable
 data[1]
 ```
 
-``` error
-Error in data[1]: object of type 'closure' is not subsettable
+``` output
+# A tibble: 352,112 × 1
+   checkin_id    
+   <chr>         
+ 1 CHECKIN_000001
+ 2 CHECKIN_000002
+ 3 CHECKIN_000003
+ 4 CHECKIN_000004
+ 5 CHECKIN_000005
+ 6 CHECKIN_000006
+ 7 CHECKIN_000007
+ 8 CHECKIN_000008
+ 9 CHECKIN_000009
+10 CHECKIN_000010
+# ℹ 352,102 more rows
 ```
 
 ``` r
@@ -531,8 +402,9 @@ Error in data[1]: object of type 'closure' is not subsettable
 head(data[[1]])
 ```
 
-``` error
-Error in data[[1]]: object of type 'closure' is not subsettable
+``` output
+[1] "CHECKIN_000001" "CHECKIN_000002" "CHECKIN_000003" "CHECKIN_000004"
+[5] "CHECKIN_000005" "CHECKIN_000006"
 ```
 
 ``` r
@@ -540,8 +412,13 @@ Error in data[[1]]: object of type 'closure' is not subsettable
 data[1:3, 3]
 ```
 
-``` error
-Error in data[1:3, 3]: object of type 'closure' is not subsettable
+``` output
+# A tibble: 3 × 1
+  checkin_time       
+  <dttm>             
+1 2018-11-06 07:02:36
+2 2018-11-06 07:04:09
+3 2018-11-06 07:05:13
 ```
 
 ``` r
@@ -549,17 +426,16 @@ Error in data[1:3, 3]: object of type 'closure' is not subsettable
 data[3, ]
 ```
 
-``` error
-Error in data[3, ]: object of type 'closure' is not subsettable
+``` output
+# A tibble: 1 × 6
+  checkin_id     checkin_length checkin_time        location     precinct device
+  <chr>                   <dbl> <dttm>              <chr>        <chr>    <chr> 
+1 CHECKIN_000003             65 2018-11-06 07:05:13 LOCATION_001 PRECINC… DEVIC…
 ```
 
 ``` r
 #equivalent to head_data <- head(data)
 head_data <- data[1:6, ]
-```
-
-``` error
-Error in data[1:6, ]: object of type 'closure' is not subsettable
 ```
 
 `:` is a special function that creates numeric vectors of integers in increasing
@@ -573,8 +449,21 @@ You can also exclude certain indices of a tibble using the "`-`" sign:
 data[, -1]
 ```
 
-``` error
-Error in data[, -1]: object of type 'closure' is not subsettable
+``` output
+# A tibble: 352,112 × 5
+   checkin_length checkin_time        location     precinct     device    
+            <dbl> <dttm>              <chr>        <chr>        <chr>     
+ 1             45 2018-11-06 07:02:36 LOCATION_001 PRECINCT_001 DEVICE_001
+ 2             29 2018-11-06 07:04:09 LOCATION_001 PRECINCT_001 DEVICE_001
+ 3             65 2018-11-06 07:05:13 LOCATION_001 PRECINCT_001 DEVICE_001
+ 4             28 2018-11-06 07:06:26 LOCATION_001 PRECINCT_001 DEVICE_001
+ 5             17 2018-11-06 07:08:08 LOCATION_001 PRECINCT_001 DEVICE_001
+ 6             56 2018-11-06 07:08:32 LOCATION_001 PRECINCT_001 DEVICE_002
+ 7             64 2018-11-06 07:09:36 LOCATION_001 PRECINCT_001 DEVICE_001
+ 8            262 2018-11-06 07:10:18 LOCATION_001 PRECINCT_001 DEVICE_001
+ 9            245 2018-11-06 07:12:57 LOCATION_001 PRECINCT_001 DEVICE_002
+10            260 2018-11-06 07:13:41 LOCATION_001 PRECINCT_001 DEVICE_001
+# ℹ 352,102 more rows
 ```
 
 ``` r
@@ -582,8 +471,16 @@ Error in data[, -1]: object of type 'closure' is not subsettable
 data[-c(7:352112), ]
 ```
 
-``` error
-Error in data[-c(7:352112), ]: object of type 'closure' is not subsettable
+``` output
+# A tibble: 6 × 6
+  checkin_id     checkin_length checkin_time        location     precinct device
+  <chr>                   <dbl> <dttm>              <chr>        <chr>    <chr> 
+1 CHECKIN_000001             45 2018-11-06 07:02:36 LOCATION_001 PRECINC… DEVIC…
+2 CHECKIN_000002             29 2018-11-06 07:04:09 LOCATION_001 PRECINC… DEVIC…
+3 CHECKIN_000003             65 2018-11-06 07:05:13 LOCATION_001 PRECINC… DEVIC…
+4 CHECKIN_000004             28 2018-11-06 07:06:26 LOCATION_001 PRECINC… DEVIC…
+5 CHECKIN_000005             17 2018-11-06 07:08:08 LOCATION_001 PRECINC… DEVIC…
+6 CHECKIN_000006             56 2018-11-06 07:08:32 LOCATION_001 PRECINC… DEVIC…
 ```
 
 `tibble`s can be subset by calling indices (as shown previously), but also by
@@ -642,39 +539,17 @@ Now, continue using `data` for each of the following activities:
 ``` r
 #part 1:
 data_100 <- data[100, ]
-```
 
-``` error
-Error in data[100, ]: object of type 'closure' is not subsettable
-```
-
-``` r
 #part 2:
 #we save nrows so we can use it multiple times! makes the code cleaner :)
 n_rows <- nrow(data)
 data_last <- data[n_rows, ]
-```
 
-``` error
-Error in data[n_rows, ]: object of type 'closure' is not subsettable
-```
-
-``` r
 #part 3:
 data_middle <- data[(n_rows/2):((n_rows/2) + 1), ]
-```
 
-``` error
-Error in (n_rows/2):((n_rows/2) + 1): argument of length 0
-```
-
-``` r
 #part 4:
 data_head <- data[-(7:n_rows), ]
-```
-
-``` error
-Error in 7:n_rows: argument of length 0
 ```
 
 :::::::::::::::::::::::::
@@ -1008,18 +883,11 @@ Let's extract our `checkin_time` column and inspect the structure:
 
 ``` r
 times <- data$checkin_time
-```
-
-``` error
-Error in data$checkin_time: object of type 'closure' is not subsettable
-```
-
-``` r
 str(times)
 ```
 
-``` error
-Error: object 'times' not found
+``` output
+ POSIXct[1:352112], format: "2018-11-06 07:02:36" "2018-11-06 07:04:09" "2018-11-06 07:05:13" ...
 ```
 
 When we imported the data in R, `read_csv()` recognized that this column
@@ -1030,209 +898,32 @@ the date, and create new columns in our tibble to store it:
 
 ``` r
 data$day <- day(times)
-```
-
-``` error
-Error: object 'times' not found
-```
-
-``` r
 data$month <- month(times)
-```
-
-``` error
-Error: object 'times' not found
-```
-
-``` r
 data$year <- year(times)
-```
-
-``` error
-Error: object 'times' not found
-```
-
-``` r
 data$hour <- hour(times)
-```
-
-``` error
-Error: object 'times' not found
-```
-
-``` r
 data$minute <- minute(times)
-```
-
-``` error
-Error: object 'times' not found
-```
-
-``` r
 data$seconds <- second(times)
-```
 
-``` error
-Error: object 'times' not found
-```
-
-``` r
 data
 ```
 
 ``` output
-function (..., list = character(), package = NULL, lib.loc = NULL, 
-    verbose = getOption("verbose"), envir = .GlobalEnv, overwrite = TRUE) 
-{
-    fileExt <- function(x) {
-        db <- grepl("\\.[^.]+\\.(gz|bz2|xz)$", x)
-        ans <- sub(".*\\.", "", x)
-        ans[db] <- sub(".*\\.([^.]+\\.)(gz|bz2|xz)$", "\\1\\2", 
-            x[db])
-        ans
-    }
-    my_read_table <- function(...) {
-        lcc <- Sys.getlocale("LC_COLLATE")
-        on.exit(Sys.setlocale("LC_COLLATE", lcc))
-        Sys.setlocale("LC_COLLATE", "C")
-        read.table(...)
-    }
-    stopifnot(is.character(list))
-    names <- c(as.character(substitute(list(...))[-1L]), list)
-    if (!is.null(package)) {
-        if (!is.character(package)) 
-            stop("'package' must be a character vector or NULL")
-    }
-    paths <- find.package(package, lib.loc, verbose = verbose)
-    if (is.null(lib.loc)) 
-        paths <- c(path.package(package, TRUE), if (!length(package)) getwd(), 
-            paths)
-    paths <- unique(normalizePath(paths[file.exists(paths)]))
-    paths <- paths[dir.exists(file.path(paths, "data"))]
-    dataExts <- tools:::.make_file_exts("data")
-    if (length(names) == 0L) {
-        db <- matrix(character(), nrow = 0L, ncol = 4L)
-        for (path in paths) {
-            entries <- NULL
-            packageName <- if (file_test("-f", file.path(path, 
-                "DESCRIPTION"))) 
-                basename(path)
-            else "."
-            if (file_test("-f", INDEX <- file.path(path, "Meta", 
-                "data.rds"))) {
-                entries <- readRDS(INDEX)
-            }
-            else {
-                dataDir <- file.path(path, "data")
-                entries <- tools::list_files_with_type(dataDir, 
-                  "data")
-                if (length(entries)) {
-                  entries <- unique(tools::file_path_sans_ext(basename(entries)))
-                  entries <- cbind(entries, "")
-                }
-            }
-            if (NROW(entries)) {
-                if (is.matrix(entries) && ncol(entries) == 2L) 
-                  db <- rbind(db, cbind(packageName, dirname(path), 
-                    entries))
-                else warning(gettextf("data index for package %s is invalid and will be ignored", 
-                  sQuote(packageName)), domain = NA, call. = FALSE)
-            }
-        }
-        colnames(db) <- c("Package", "LibPath", "Item", "Title")
-        footer <- if (missing(package)) 
-            paste0("Use ", sQuote(paste("data(package =", ".packages(all.available = TRUE))")), 
-                "\n", "to list the data sets in all *available* packages.")
-        else NULL
-        y <- list(title = "Data sets", header = NULL, results = db, 
-            footer = footer)
-        class(y) <- "packageIQR"
-        return(y)
-    }
-    paths <- file.path(paths, "data")
-    for (name in names) {
-        found <- FALSE
-        for (p in paths) {
-            tmp_env <- if (overwrite) 
-                envir
-            else new.env()
-            if (file_test("-f", file.path(p, "Rdata.rds"))) {
-                rds <- readRDS(file.path(p, "Rdata.rds"))
-                if (name %in% names(rds)) {
-                  found <- TRUE
-                  if (verbose) 
-                    message(sprintf("name=%s:\t found in Rdata.rds", 
-                      name), domain = NA)
-                  objs <- rds[[name]]
-                  lazyLoad(file.path(p, "Rdata"), envir = tmp_env, 
-                    filter = function(x) x %in% objs)
-                  break
-                }
-                else if (verbose) 
-                  message(sprintf("name=%s:\t NOT found in names() of Rdata.rds, i.e.,\n\t%s\n", 
-                    name, paste(names(rds), collapse = ",")), 
-                    domain = NA)
-            }
-            files <- list.files(p, full.names = TRUE)
-            files <- files[grep(name, files, fixed = TRUE)]
-            if (length(files) > 1L) {
-                o <- match(fileExt(files), dataExts, nomatch = 100L)
-                paths0 <- dirname(files)
-                paths0 <- factor(paths0, levels = unique(paths0))
-                files <- files[order(paths0, o)]
-            }
-            if (length(files)) {
-                for (file in files) {
-                  if (verbose) 
-                    message("name=", name, ":\t file= ...", .Platform$file.sep, 
-                      basename(file), "::\t", appendLF = FALSE, 
-                      domain = NA)
-                  ext <- fileExt(file)
-                  if (basename(file) != paste0(name, ".", ext)) 
-                    found <- FALSE
-                  else {
-                    found <- TRUE
-                    switch(ext, R = , r = {
-                      library("utils")
-                      sys.source(file, chdir = TRUE, envir = tmp_env)
-                    }, RData = , rdata = , rda = load(file, envir = tmp_env), 
-                      TXT = , txt = , tab = , tab.gz = , tab.bz2 = , 
-                      tab.xz = , txt.gz = , txt.bz2 = , txt.xz = assign(name, 
-                        my_read_table(file, header = TRUE, as.is = FALSE), 
-                        envir = tmp_env), CSV = , csv = , csv.gz = , 
-                      csv.bz2 = , csv.xz = assign(name, my_read_table(file, 
-                        header = TRUE, sep = ";", as.is = FALSE), 
-                        envir = tmp_env), found <- FALSE)
-                  }
-                  if (found) 
-                    break
-                }
-                if (verbose) 
-                  message(if (!found) 
-                    "*NOT* ", "found", domain = NA)
-            }
-            if (found) 
-                break
-        }
-        if (!found) {
-            warning(gettextf("data set %s not found", sQuote(name)), 
-                domain = NA)
-        }
-        else if (!overwrite) {
-            for (o in ls(envir = tmp_env, all.names = TRUE)) {
-                if (exists(o, envir = envir, inherits = FALSE)) 
-                  warning(gettextf("an object named %s already exists and will not be overwritten", 
-                    sQuote(o)))
-                else assign(o, get(o, envir = tmp_env, inherits = FALSE), 
-                  envir = envir)
-            }
-            rm(tmp_env)
-        }
-    }
-    invisible(names)
-}
-<bytecode: 0x56544ab08068>
-<environment: namespace:utils>
+# A tibble: 352,112 × 12
+   checkin_id  checkin_length checkin_time        location precinct device   day
+   <chr>                <dbl> <dttm>              <chr>    <chr>    <chr>  <int>
+ 1 CHECKIN_00…             45 2018-11-06 07:02:36 LOCATIO… PRECINC… DEVIC…     6
+ 2 CHECKIN_00…             29 2018-11-06 07:04:09 LOCATIO… PRECINC… DEVIC…     6
+ 3 CHECKIN_00…             65 2018-11-06 07:05:13 LOCATIO… PRECINC… DEVIC…     6
+ 4 CHECKIN_00…             28 2018-11-06 07:06:26 LOCATIO… PRECINC… DEVIC…     6
+ 5 CHECKIN_00…             17 2018-11-06 07:08:08 LOCATIO… PRECINC… DEVIC…     6
+ 6 CHECKIN_00…             56 2018-11-06 07:08:32 LOCATIO… PRECINC… DEVIC…     6
+ 7 CHECKIN_00…             64 2018-11-06 07:09:36 LOCATIO… PRECINC… DEVIC…     6
+ 8 CHECKIN_00…            262 2018-11-06 07:10:18 LOCATIO… PRECINC… DEVIC…     6
+ 9 CHECKIN_00…            245 2018-11-06 07:12:57 LOCATIO… PRECINC… DEVIC…     6
+10 CHECKIN_00…            260 2018-11-06 07:13:41 LOCATIO… PRECINC… DEVIC…     6
+# ℹ 352,102 more rows
+# ℹ 5 more variables: month <dbl>, year <dbl>, hour <int>, minute <int>,
+#   seconds <dbl>
 ```
 
 Notice the six new columns at the end of our tibble.
@@ -1303,10 +994,6 @@ date and time columns as `"checkin_data_2.csv"`:
 ``` r
 #takes the tibble and outputs it as a csv file
 write_csv(data, "data/checkin_data_2.csv")
-```
-
-``` error
-Error in write_delim(x, file, delim = ",", na = na, append = append, col_names = col_names, : is.data.frame(x) is not TRUE
 ```
 
 When choosing the name for the new file, ensure there are no files with the same

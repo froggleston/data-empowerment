@@ -53,18 +53,10 @@ library(tidyverse)
 library(here)
 ```
 
-``` error
-Error in library(here): there is no package called 'here'
-```
-
 Next, we will read in the Check-In Data:
 
 ``` r
 data <- read_csv(here("data", "checkin_data_2.csv"))
-```
-
-``` error
-Error in here("data", "checkin_data_2.csv"): could not find function "here"
 ```
 
 ## Reshaping with pivot\_wider() and pivot\_longer()
@@ -108,8 +100,8 @@ data %>%
   nrow()
 ```
 
-``` error
-Error in UseMethod("select"): no applicable method for 'select' applied to an object of class "function"
+``` output
+[1] 352112
 ```
 
 As seen in the code below, for each check-in time corresponding to each device, no 
@@ -124,8 +116,20 @@ data %>%
   sample_n(size = 10)
 ```
 
-``` error
-Error in UseMethod("filter"): no applicable method for 'filter' applied to an object of class "function"
+``` output
+# A tibble: 10 × 3
+   checkin_id     checkin_time        location    
+   <chr>          <dttm>              <chr>       
+ 1 CHECKIN_000149 2018-11-06 09:21:01 LOCATION_001
+ 2 CHECKIN_000337 2018-11-06 12:21:12 LOCATION_001
+ 3 CHECKIN_000343 2018-11-06 12:31:57 LOCATION_001
+ 4 CHECKIN_000258 2018-11-06 10:57:54 LOCATION_001
+ 5 CHECKIN_000021 2018-11-06 07:25:07 LOCATION_001
+ 6 CHECKIN_000037 2018-11-06 07:44:49 LOCATION_001
+ 7 CHECKIN_000207 2018-11-06 10:07:33 LOCATION_001
+ 8 CHECKIN_000503 2018-11-06 17:02:47 LOCATION_001
+ 9 CHECKIN_000470 2018-11-06 16:11:21 LOCATION_001
+10 CHECKIN_000233 2018-11-06 10:32:06 LOCATION_001
 ```
 
 If you were to look at the entire `data` data set, you would notice that the 
@@ -251,18 +255,21 @@ data_tc <- data %>%
   values_from = n,
   values_fill = 0
 )
-```
 
-``` error
-Error in UseMethod("count"): no applicable method for 'count' applied to an object of class "function"
-```
-
-``` r
 head(data_tc)
 ```
 
-``` error
-Error: object 'data_tc' not found
+``` output
+# A tibble: 6 × 16
+  location       `7`   `8`   `9`  `10`  `11`  `12`  `13`  `14`  `15`  `16`  `17`
+  <chr>        <int> <int> <int> <int> <int> <int> <int> <int> <int> <int> <int>
+1 LOCATION_001    50    71    77    62    65    40    41    30    28    35    62
+2 LOCATION_002    16    29    19    32    14    22    14    13    19    20    24
+3 LOCATION_003    74    69    88   106    65    64    54    42    49    51    55
+4 LOCATION_004    81    74    73    61    59    29    35    36    42    45    54
+5 LOCATION_005    53    31    57    64    61    49    57    45    54    67    99
+6 LOCATION_006   115    65    75    75    78    44    50    52    50    92    88
+# ℹ 4 more variables: `18` <int>, `19` <int>, `6` <int>, `20` <int>
 ```
 
 Oh no! It looks like the hours columns are out of order, with 6 sitting between
@@ -286,18 +293,21 @@ data_tc <- data %>%
   values_fill = 0,
   names_sort = TRUE #sorts the columns from left to right
 )
-```
 
-``` error
-Error in UseMethod("count"): no applicable method for 'count' applied to an object of class "function"
-```
-
-``` r
 head(data_tc)
 ```
 
-``` error
-Error: object 'data_tc' not found
+``` output
+# A tibble: 6 × 16
+  location       `6`   `7`   `8`   `9`  `10`  `11`  `12`  `13`  `14`  `15`  `16`
+  <chr>        <int> <int> <int> <int> <int> <int> <int> <int> <int> <int> <int>
+1 LOCATION_001     0    50    71    77    62    65    40    41    30    28    35
+2 LOCATION_002     0    16    29    19    32    14    22    14    13    19    20
+3 LOCATION_003     0    74    69    88   106    65    64    54    42    49    51
+4 LOCATION_004     0    81    74    73    61    59    29    35    36    42    45
+5 LOCATION_005     0    53    31    57    64    61    49    57    45    54    67
+6 LOCATION_006     1   115    65    75    75    78    44    50    52    50    92
+# ℹ 4 more variables: `17` <int>, `18` <int>, `19` <int>, `20` <int>
 ```
 
 As seen by the outputted tibble above, the hour columns now appear in ascending 
@@ -312,8 +322,8 @@ First, let's check the dimensions:
 dim(data_tc)
 ```
 
-``` error
-Error: object 'data_tc' not found
+``` output
+[1] 417  16
 ```
 
 As we can see, there are 417 rows and 16 columns! Each row represents a unique 
@@ -324,8 +334,8 @@ location values within `data`:
 n_distinct(data$location)
 ```
 
-``` error
-Error in data$location: object of type 'closure' is not subsettable
+``` output
+[1] 417
 ```
 
 This also returns 417, confirming that each row corresponds to a single, unique 
@@ -337,8 +347,10 @@ Next, let's look at the 16 columns of the tibble:
 colnames(data_tc)
 ```
 
-``` error
-Error: object 'data_tc' not found
+``` output
+ [1] "location" "6"        "7"        "8"        "9"        "10"      
+ [7] "11"       "12"       "13"       "14"       "15"       "16"      
+[13] "17"       "18"       "19"       "20"      
 ```
 
 Notice there is no longer a column titled `hour`. This is because the `pivot_wider()` 
@@ -358,8 +370,21 @@ data_tc %>%
   arrange(desc(`7`))
 ```
 
-``` error
-Error: object 'data_tc' not found
+``` output
+# A tibble: 417 × 2
+   location       `7`
+   <chr>        <int>
+ 1 LOCATION_233   234
+ 2 LOCATION_364   215
+ 3 LOCATION_258   212
+ 4 LOCATION_366   197
+ 5 LOCATION_417   197
+ 6 LOCATION_306   194
+ 7 LOCATION_317   193
+ 8 LOCATION_166   189
+ 9 LOCATION_403   188
+10 LOCATION_386   183
+# ℹ 407 more rows
 ```
 
 Or, we can calculate the total amount of check-ins for each location across all 
@@ -372,8 +397,21 @@ data_tc %>%
   arrange(total_checkins)
 ```
 
-``` error
-Error: object 'data_tc' not found
+``` output
+# A tibble: 417 × 2
+   location     total_checkins
+   <chr>                 <dbl>
+ 1 LOCATION_048              2
+ 2 LOCATION_308             11
+ 3 LOCATION_393             38
+ 4 LOCATION_103             42
+ 5 LOCATION_280             42
+ 6 LOCATION_164             58
+ 7 LOCATION_298             60
+ 8 LOCATION_101             64
+ 9 LOCATION_014             66
+10 LOCATION_138             68
+# ℹ 407 more rows
 ```
 
 :::::::::::::::::::::::::::::::::::::::  challenge
@@ -405,18 +443,16 @@ data_total <- data %>%
     names_sort = TRUE
     ) %>%
   mutate(total_checkins = rowSums(across(everything())))
-```
 
-``` error
-Error in UseMethod("count"): no applicable method for 'count' applied to an object of class "function"
-```
-
-``` r
 data_total
 ```
 
-``` error
-Error: object 'data_total' not found
+``` output
+# A tibble: 1 × 16
+    `6`   `7`   `8`   `9`  `10`  `11`  `12`  `13`  `14`  `15`  `16`  `17`  `18`
+  <int> <int> <int> <int> <int> <int> <int> <int> <int> <int> <int> <int> <int>
+1   265 34918 29613 34076 35186 30909 23119 21751 20178 23233 28925 31774 25924
+# ℹ 3 more variables: `19` <int>, `20` <int>, total_checkins <dbl>
 ```
 
 ``` r
@@ -429,27 +465,19 @@ data_total_2 <- data %>%
     values_fill = 0,
     names_sort = TRUE
     )
-```
 
-``` error
-Error in UseMethod("count"): no applicable method for 'count' applied to an object of class "function"
-```
-
-``` r
 data_total_2 <- data_total_2 %>%
   mutate(total_checkins = rowSums(data_total_2))
-```
 
-``` error
-Error: object 'data_total_2' not found
-```
-
-``` r
 data_total_2
 ```
 
-``` error
-Error: object 'data_total_2' not found
+``` output
+# A tibble: 1 × 16
+    `6`   `7`   `8`   `9`  `10`  `11`  `12`  `13`  `14`  `15`  `16`  `17`  `18`
+  <int> <int> <int> <int> <int> <int> <int> <int> <int> <int> <int> <int> <int>
+1   265 34918 29613 34076 35186 30909 23119 21751 20178 23233 28925 31774 25924
+# ℹ 3 more variables: `19` <int>, `20` <int>, total_checkins <dbl>
 ```
 
 :::::::::::::::::::::::::
@@ -486,18 +514,23 @@ data_tc_long <- data_tc %>%
                values_to = "checkin_count")
 ```
 
-``` error
-Error: object 'data_tc' not found
-```
-
 Below, we will look at the two tibbles and compare their structures:
 
 ``` r
 head(data_tc)
 ```
 
-``` error
-Error: object 'data_tc' not found
+``` output
+# A tibble: 6 × 16
+  location       `6`   `7`   `8`   `9`  `10`  `11`  `12`  `13`  `14`  `15`  `16`
+  <chr>        <int> <int> <int> <int> <int> <int> <int> <int> <int> <int> <int>
+1 LOCATION_001     0    50    71    77    62    65    40    41    30    28    35
+2 LOCATION_002     0    16    29    19    32    14    22    14    13    19    20
+3 LOCATION_003     0    74    69    88   106    65    64    54    42    49    51
+4 LOCATION_004     0    81    74    73    61    59    29    35    36    42    45
+5 LOCATION_005     0    53    31    57    64    61    49    57    45    54    67
+6 LOCATION_006     1   115    65    75    75    78    44    50    52    50    92
+# ℹ 4 more variables: `17` <int>, `18` <int>, `19` <int>, `20` <int>
 ```
 
 
@@ -505,8 +538,16 @@ Error: object 'data_tc' not found
 head(data_tc_long)
 ```
 
-``` error
-Error: object 'data_tc_long' not found
+``` output
+# A tibble: 6 × 3
+  location     checkin_hour checkin_count
+  <chr>        <chr>                <int>
+1 LOCATION_001 6                        0
+2 LOCATION_001 7                       50
+3 LOCATION_001 8                       71
+4 LOCATION_001 9                       77
+5 LOCATION_001 10                      62
+6 LOCATION_001 11                      65
 ```
 
 As you can see, the hours and their corresponding counts for each location are 
@@ -537,18 +578,29 @@ data_total_long <- data_total %>%
     names_to = "hour",
     values_to = "checkin_count"
   )
-```
 
-``` error
-Error: object 'data_total' not found
-```
-
-``` r
 data_total_long
 ```
 
-``` error
-Error: object 'data_total_long' not found
+``` output
+# A tibble: 15 × 2
+   hour  checkin_count
+   <chr>         <int>
+ 1 6               265
+ 2 7             34918
+ 3 8             29613
+ 4 9             34076
+ 5 10            35186
+ 6 11            30909
+ 7 12            23119
+ 8 13            21751
+ 9 14            20178
+10 15            23233
+11 16            28925
+12 17            31774
+13 18            25924
+14 19            12178
+15 20               63
 ```
 
 :::::::::::::::::::::::::
@@ -725,10 +777,6 @@ Below, we will be reading in the Check-In Dataset using the additional line:
 messy_data <- read_csv(here("data", "messy_data.csv"), na = "NULL")
 ```
 
-``` error
-Error in here("data", "messy_data.csv"): could not find function "here"
-```
-
 
 ### Tidying the Data
 Throughout this next section, we're going to be tidying/cleaning the Check-In 
@@ -740,8 +788,24 @@ We'll start by looking at the data so we can understand what we're working with:
 messy_data
 ```
 
-``` error
-Error: object 'messy_data' not found
+``` output
+# A tibble: 514 × 4
+   CheckIn_Duration_Provisional CheckIn_Duration_Assist…¹ CheckIn_Duration_Pro…²
+                          <dbl>                     <dbl>                  <dbl>
+ 1                           NA                        NA                     NA
+ 2                           NA                        NA                     NA
+ 3                           NA                        NA                     NA
+ 4                           NA                        NA                     NA
+ 5                           NA                        NA                     NA
+ 6                           NA                        NA                     NA
+ 7                           NA                        NA                     NA
+ 8                           NA                        NA                     NA
+ 9                           NA                        NA                     NA
+10                           NA                        NA                     NA
+# ℹ 504 more rows
+# ℹ abbreviated names: ¹​CheckIn_Duration_Assistance,
+#   ²​CheckIn_Duration_Provisional_and_Assistance
+# ℹ 1 more variable: CheckIn_Duration_ <dbl>
 ```
 
 At first glance, we can see this data set is wide, with each label tacked onto 
@@ -759,18 +823,20 @@ clean_data <- messy_data %>%
   pivot_longer(cols = everything(),
                names_to = "label",
                values_to = "duration")
-```
 
-``` error
-Error: object 'messy_data' not found
-```
-
-``` r
 head(clean_data)
 ```
 
-``` error
-Error: object 'clean_data' not found
+``` output
+# A tibble: 6 × 2
+  label                                       duration
+  <chr>                                          <dbl>
+1 CheckIn_Duration_Provisional                      NA
+2 CheckIn_Duration_Assistance                       NA
+3 CheckIn_Duration_Provisional_and_Assistance       NA
+4 CheckIn_Duration_                                 80
+5 CheckIn_Duration_Provisional                      NA
+6 CheckIn_Duration_Assistance                       NA
 ```
 
 Oh no! That's a lot of `NA` values. Taking a closer look at the original data, 
@@ -785,18 +851,20 @@ we can drop them from the tibble completely:
 ``` r
 clean_data <- clean_data %>%
   drop_na()
-```
 
-``` error
-Error: object 'clean_data' not found
-```
-
-``` r
 head(clean_data)
 ```
 
-``` error
-Error: object 'clean_data' not found
+``` output
+# A tibble: 6 × 2
+  label             duration
+  <chr>                <dbl>
+1 CheckIn_Duration_       80
+2 CheckIn_Duration_       55
+3 CheckIn_Duration_       61
+4 CheckIn_Duration_       58
+5 CheckIn_Duration_       63
+6 CheckIn_Duration_       64
 ```
 
 Now we're getting somewhere! Next, when we loaded in the data set, it was noted that
@@ -807,18 +875,20 @@ to revert that change:
 clean_data <- clean_data %>%
   #including "all" in the str replace call ensures both underscores are replaced
   mutate(label = str_replace_all(label, "_", " "))
-```
 
-``` error
-Error: object 'clean_data' not found
-```
-
-``` r
 head(clean_data)
 ```
 
-``` error
-Error: object 'clean_data' not found
+``` output
+# A tibble: 6 × 2
+  label               duration
+  <chr>                  <dbl>
+1 "CheckIn Duration "       80
+2 "CheckIn Duration "       55
+3 "CheckIn Duration "       61
+4 "CheckIn Duration "       58
+5 "CheckIn Duration "       63
+6 "CheckIn Duration "       64
 ```
 
 Our next step is removing the "CheckIn Duration " phrase from each label, which 
@@ -827,18 +897,20 @@ we will be completing below:
 ``` r
 clean_data <- clean_data %>%
   mutate(label = str_remove(label, "CheckIn Duration "))
-```
 
-``` error
-Error: object 'clean_data' not found
-```
-
-``` r
 head(clean_data)
 ```
 
-``` error
-Error: object 'clean_data' not found
+``` output
+# A tibble: 6 × 2
+  label duration
+  <chr>    <dbl>
+1 ""          80
+2 ""          55
+3 ""          61
+4 ""          58
+5 ""          63
+6 ""          64
 ```
 
 After removing the "CheckIn Duration " prefix, we can see that some of our labels 
@@ -849,18 +921,20 @@ step will be replacing the empty labels with "Normal" labels:
 ``` r
 clean_data <- clean_data %>%
   mutate(label = ifelse(label == "", "Normal", label))
-```
 
-``` error
-Error: object 'clean_data' not found
-```
-
-``` r
 head(clean_data)
 ```
 
-``` error
-Error: object 'clean_data' not found
+``` output
+# A tibble: 6 × 2
+  label  duration
+  <chr>     <dbl>
+1 Normal       80
+2 Normal       55
+3 Normal       61
+4 Normal       58
+5 Normal       63
+6 Normal       64
 ```
 
 Now, our data is clean! In practice, all of these functions can (and should!) be 
@@ -880,18 +954,20 @@ clean_data_final <- messy_data %>%
   mutate(label = str_remove(label, "CheckIn Duration ")) %>%
   #replace empty labels with "Normal"
   mutate(label = ifelse(label == "", "Normal", label))
-```
-
-``` error
-Error: object 'messy_data' not found
-```
-
-``` r
+  
 head(clean_data_final)
 ```
 
-``` error
-Error: object 'clean_data_final' not found
+``` output
+# A tibble: 6 × 2
+  label  duration
+  <chr>     <dbl>
+1 Normal       80
+2 Normal       55
+3 Normal       61
+4 Normal       58
+5 Normal       63
+6 Normal       64
 ```
 
 Since our data has been cleaned, we can now export it as `clean_data.csv` for 
@@ -901,10 +977,6 @@ data folder:
 
 ``` r
 write_csv(clean_data_final, "data/clean_data.csv")
-```
-
-``` error
-Error: object 'clean_data_final' not found
 ```
 
 :::::::::::::::::::::::::::::::::::::::: keypoints
