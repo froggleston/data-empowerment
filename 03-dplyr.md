@@ -594,8 +594,12 @@ data %>%
 ```
 
 ``` output
-`summarise()` has grouped output by 'precinct'. You can override using the
-`.groups` argument.
+`summarise()` has regrouped the output.
+ℹ Summaries were computed grouped by precinct and device.
+ℹ Output is grouped by precinct.
+ℹ Use `summarise(.groups = "drop_last")` to silence this message.
+ℹ Use `summarise(.by = c(precinct, device))` for per-operation grouping
+  (`?dplyr::dplyr_by`) instead.
 ```
 
 ``` output
